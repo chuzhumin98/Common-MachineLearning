@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Filter {
 	public static final String filterPath = "output/topfilterword.txt";
@@ -38,12 +39,13 @@ public class Filter {
 				String line = input.nextLine();
 				count++;
 				String[] splits = line.split(" ");
-				if (!this.stopWords.contains(splits[0])) {
+				if (!this.stopWords.contains(splits[0]) 
+						&& !Filter.isInteger(splits[0])) { //当为停用词或整数时去掉
 					this.topfilterword.add(line);
 				}
 			}
-			System.out.println("total lines:"+count);
-			System.out.println("top word after filtering:"+this.topfilterword.size());
+			System.out.println("total top words:"+count);
+			System.out.println("top words after filtering:"+this.topfilterword.size());
 			this.printFilterResult();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -51,6 +53,17 @@ public class Filter {
 		}
 		
 	}
+	
+	/** 参考：https://www.cnblogs.com/heyuxiu/p/5972187.html
+	  * 判断是否为整数 
+	  * @param str 传入的字符串 
+	  * @return 是整数返回true,否则返回false 
+	*/
+
+	  public static boolean isInteger(String str) {  
+	        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");  
+	        return pattern.matcher(str).matches();  
+	  }
 	
 	/**
 	 * 将过滤后的高频词写入文件中
