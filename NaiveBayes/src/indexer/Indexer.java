@@ -116,12 +116,12 @@ public class Indexer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
 	}
 	
 	public static void main(String[] args) {
 		Indexer index1 = new Indexer();
 		index1.readIndex();
-		index1.setWordList();
+		//index1.setWordList();
+		//Filter.main(null);
 	}
 }
