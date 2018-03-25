@@ -13,8 +13,8 @@ import java.util.Scanner;
 
 public class Indexer {
 	public final static String indexPath = "input/label/index_cut"; //index文件的地址
-	public final static String topWordPath = "output/topword.txt"; //存储出现次数最多的11000个term
-	public final static int topWordSize = 11000; //这里我们仅输出11000个top的terms
+	public final static String topWordPath = "output/topword.txt"; //存储出现次数最多的12000个term
+	public final static int topWordSize = 12000; //这里我们仅输出12000个top的terms
 	ArrayList<String> indexPathes; //用来记录各文件的地址ַ
 	ArrayList<Boolean> isSpam; //用来存储这些文件对应的是不是垃圾邮件
 	Map<String,Integer> wordList = new HashMap<String,Integer>(); //存储词项列表的哈希表
