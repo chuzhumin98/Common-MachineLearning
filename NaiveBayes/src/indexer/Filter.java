@@ -47,6 +47,7 @@ public class Filter {
 			System.out.println("total top words:"+count);
 			System.out.println("top words after filtering:"+this.topfilterword.size());
 			this.printFilterResult();
+			input.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,6 +75,7 @@ public class Filter {
 			for (int i = 0; i < this.topfilterword.size(); i++) {
 				output.println(this.topfilterword.get(i));
 			}
+			output.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

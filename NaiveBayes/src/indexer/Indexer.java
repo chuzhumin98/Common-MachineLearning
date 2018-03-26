@@ -14,10 +14,12 @@ import java.util.Scanner;
 public class Indexer {
 	public final static String indexPath = "input/label/index_cut"; //index文件的地址
 	public final static String topWordPath = "output/topword.txt"; //存储出现次数最多的12000个term
+	public final static String reorderTopWordPath = "output/topwordreorder.txt"; //存储重排序后的热门词汇
 	public final static int topWordSize = 12000; //这里我们仅输出12000个top的terms
-	ArrayList<String> indexPathes; //用来记录各文件的地址ַ
-	ArrayList<Boolean> isSpam; //用来存储这些文件对应的是不是垃圾邮件
-	Map<String,Integer> wordList = new HashMap<String,Integer>(); //存储词项列表的哈希表
+	public ArrayList<String> indexPathes; //用来记录各文件的地址ַ
+	public ArrayList<Boolean> isSpam; //用来存储这些文件对应的是不是垃圾邮件
+	public Map<String,Integer> wordList = new HashMap<String,Integer>(); //存储词项列表的哈希表
+	public boolean isFiltered = true; //记录是否进行term过滤
 	
 	public Indexer() {
 		indexPathes = new ArrayList<String>();
@@ -118,10 +120,54 @@ public class Indexer {
 		}
 	}
 	
+	/**
+	 * 根据信息增益对term进行重排序
+	 */
+	public void reorderTopword() {
+		if (this.indexPathes.size() == 0) {
+			this.readIndex(); //还没有读取索引时先读取索引信息
+		}
+		File file = null;
+		if (this.isFiltered) {
+			file = new File(Filter.filterPath);
+		} else {
+			file = new File(Indexer.topWordPath);
+		}
+		try {
+			Scanner input = new Scanner(file);
+			Map<String,Double> topWordList = new HashMap<String,Double>(); //记录高频词的信息增益
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public static void main(String[] args) {
 		Indexer index1 = new Indexer();
 		index1.readIndex();
 		//index1.setWordList();
 		//Filter.main(null);
+	}
+	
+	/**
+	 * 存储term相关信息的类，包括在spam、ham类中出现的文档个数，信息增益值
+	 * 
+	 * @author chuzhumin
+	 *
+	 */
+	public class wordInfo {
+		public int spamNum; //spam类出现在的文档个数
+		public int hamNum; //ham类出现在的文档个数
+		public double gain; //该term所带来的信息增益
+		
+		public wordInfo() {
+			this.spamNum = 0;
+			this.hamNum = 0;
+			this.gain = 0.0;
+		}
+		
+		
 	}
 }
