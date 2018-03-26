@@ -33,7 +33,7 @@ public class Filter {
 	 */
 	public void doFilter() {
 		try {
-			Scanner input = new Scanner(new File(Indexer.topWordPath));
+			Scanner input = new Scanner(new File(WordIndexer.topWordPath));
 			int count = 0;
 			while (input.hasNextLine()) {
 				String line = input.nextLine();

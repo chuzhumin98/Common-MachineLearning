@@ -47,8 +47,11 @@ public class WordInfo {
 	 */
 	public void calculateInfoGain(int spamTotal, int hamTotal) {
 		double entropy = this.calcalateEntropy(spamTotal, spamTotal+hamTotal);
-		double newEntropy = spamTotal * this.calcalateEntropy(this.spamNum, spamTotal) / (spamTotal+hamTotal)
-				+ hamTotal * this.calcalateEntropy(this.hamNum, hamTotal) / (spamTotal+hamTotal);
+		int totalNum = spamTotal + hamTotal;
+		int ownwordNum = this.spamNum+this.hamNum;
+		int otherwordNum = (spamTotal + hamTotal) - ownwordNum; 
+		double newEntropy = ownwordNum * this.calcalateEntropy(this.spamNum, ownwordNum) / totalNum
+				+ otherwordNum * this.calcalateEntropy(spamTotal-this.spamNum, otherwordNum) / totalNum;
 		this.gain = entropy - newEntropy; //信息增益为两者之差
 	}
 	
