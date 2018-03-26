@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * 筛选出来的高频词的索引，主要涉及
+ * 筛选出来的高频词的索引，主要涉及过滤停用词、数字，对热词进行信息增益的排序
  * 
  * @author chuzhumin
  *
