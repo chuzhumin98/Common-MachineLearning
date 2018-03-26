@@ -85,7 +85,32 @@ public class NaiveBayes {
 				this.featureCount[i][j] = 0;
 			}
 		}
-		
+		/**
+		 * 计数所需的相关数据
+		 */
+		for (int i = 0; i < this.trainSize; i++) {
+			int index = this.sampleIndex.get(i); //随机化的第i个样本点
+			Entity tempEntity = this.entities.get(index);
+			this.classCount[tempEntity.label]++; //对应的类型文档数加一
+			for (int j = 0; j < this.featureNum; j++) {
+				if (tempEntity.feature[j] > 0) { 
+					this.featureCount[tempEntity.label][j]++; //该为特征中有值则记入
+				}
+			}
+		}
+		//训练结果输出展示
+		System.out.println("spam doc size:"+this.classCount[1]);
+		System.out.println("ham doc size:"+this.classCount[0]);
+		System.out.println("for spam type:");
+		for (int i = 0; i < this.featureNum; i++) {
+			System.out.print(this.featureCount[1][i]+" ");
+		}
+		System.out.println();
+		System.out.println("for ham type:");
+		for (int i = 0; i < this.featureNum; i++) {
+			System.out.print(this.featureCount[0][i]+" ");
+		}
+		System.out.println();
 	}
 	
 	public static void main(String[] args) {
