@@ -3,6 +3,7 @@ package bayes;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class NaiveBayes {
@@ -11,9 +12,11 @@ public class NaiveBayes {
 	public static final int trainSize = 45000; //训练集数据的大小
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
 	public int featureNum;
+	public ArrayList<Integer> sampleIndex; //样本的索引，前trainsize个为训练集，之后为测试集
 	
 	public NaiveBayes() {
-		this.LoadMatrix();
+		//this.LoadMatrix();
+		this.shuffleSample();
 	}
 	
 	/**
@@ -47,6 +50,22 @@ public class NaiveBayes {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 针对样本进行洗牌操作，从而使得训练集的选取具有随机性
+	 */
+	public void shuffleSample() {
+		this.sampleIndex = new ArrayList<Integer>();
+		for (int i = 0; i < this.docSize; i++) {
+			this.sampleIndex.add(i);
+		}
+		Collections.shuffle(sampleIndex);
+		//for (int i = 0; i < Math.min(this.sampleIndex.size(),1000); i++) {
+		//	System.out.println(this.sampleIndex.get(i));
+		//}
+	}
+	
+	
 	
 	public static void main(String[] args) {
 		NaiveBayes bayes = new NaiveBayes();
