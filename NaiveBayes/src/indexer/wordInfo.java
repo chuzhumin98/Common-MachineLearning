@@ -9,9 +9,10 @@ package indexer;
 public class WordInfo {
 	public int spamNum; //spam类出现在的文档个数
 	public int hamNum; //ham类出现在的文档个数
-	public double gain; //该term所带来的信息增益
+	public Double gain; //该term所带来的信息增益
 	public int spamLastIndex; //spam类的上一个文档索引
 	public int hamLastIndex; //ham类的上一个文档索引
+	public String count; //记录该term总的出现次数
 	
 	public WordInfo() {
 		this.spamNum = 0;

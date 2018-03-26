@@ -121,9 +121,9 @@ public class Indexer {
 	}
 	
 	/**
-	 * 根据信息增益对term进行重排序
+	 * 根据信息增益对term进行重排序,并输出前size的结果
 	 */
-	public void reorderTopword() {
+	public void reorderTopword(int size) {
 		if (this.indexPathes.size() == 0) {
 			this.readIndex(); //还没有读取索引时先读取索引信息
 		}
@@ -149,6 +149,7 @@ public class Indexer {
 				String line = input.nextLine();
 				String[] splits = line.split(" ");
 				WordInfo info1 = new WordInfo();
+				info1.count = splits[1];
 				topWordList.put(splits[0], info1);
 			}
 			for (int i = 0; i < this.indexPathes.size(); i++) {
@@ -186,15 +187,32 @@ public class Indexer {
 				}
 				if ((i+1) % 1000 == 0) {
 					System.out.println("has index "+(i+1)+" docs.");
-					System.out.println("current size: "+this.wordList.size());
+					System.out.println("current size: "+topWordList.size());
 				}
 			}
 			System.out.println("has index all the documents");
-			System.out.println("current size: "+this.wordList.size());
+			System.out.println("current size: "+topWordList.size());
 			for (Map.Entry<String, WordInfo> item: topWordList.entrySet()) {
 				item.getValue().calculateInfoGain(spamTotal, hamTotal);
 			}
-			
+			// 对HashMap中的key 进行排序  
+			List<Map.Entry<String,WordInfo>> list = new ArrayList<Map.Entry<String,WordInfo>>(topWordList.entrySet());
+	        Collections.sort(list, new Comparator<Map.Entry<String, WordInfo>>() {  
+	            public int compare(Map.Entry<String, WordInfo> o1,  
+	                    Map.Entry<String, WordInfo> o2) {  
+	                return (o2.getValue().gain.compareTo(o1.getValue().gain));  
+	            }  
+	        }); 
+	        try {
+				PrintStream output = new PrintStream(new File(Indexer.reorderTopWordPath));
+				for (int i = 0; i < size; i++) {
+					output.println(list.get(i).getKey()+" "+list.get(i).getValue().gain
+							+" "+list.get(i).getValue().count);
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -209,7 +227,7 @@ public class Indexer {
 			//index1.setWordList();
 			//Filter.main(null);
 		}
-		index1.reorderTopword();
+		index1.reorderTopword(1000);
 	}
 	
 
