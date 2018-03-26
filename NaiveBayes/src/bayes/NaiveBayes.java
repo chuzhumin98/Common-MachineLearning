@@ -4,15 +4,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class NaiveBayes {
 	public static final String matrixPath = "output/featurematrix.txt";
 	public int docSize = 64620; //总的文档个数
 	public static final int trainSize = 45000; //训练集数据的大小
+	public static final int testStart = 45001; //测试集数据开始位置
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
-	public int featureNum;
-	public ArrayList<Integer> sampleIndex; //样本的索引，前trainsize个为训练集，之后为测试集
+	public int featureNum; //特征的维度
+	public ArrayList<Integer> sampleIndex; //样本的索引，前trainsize个为训练集，testsize之后为测试集
+	public int[][] featureCount; //记录各类训练集各维度的信息
+	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
 	public NaiveBayes() {
 		//this.LoadMatrix();
@@ -65,7 +70,23 @@ public class NaiveBayes {
 		//}
 	}
 	
-	
+	/**
+	 * 训练Naive Bayes模型，采用0-1离散模型
+	 */
+	public void trainModel() {
+		/**
+		 * 数据的初始化操作
+		 */
+		this.classCount = new int [2];
+		this.featureCount = new int [2][this.featureNum];
+		for (int i = 0; i < 2; i++) {
+			this.classCount[i] = 0;
+			for (int j = 0; j < this.featureNum; j++) {
+				this.featureCount[i][j] = 0;
+			}
+		}
+		
+	}
 	
 	public static void main(String[] args) {
 		NaiveBayes bayes = new NaiveBayes();
