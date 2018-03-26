@@ -127,6 +127,15 @@ public class Indexer {
 		if (this.indexPathes.size() == 0) {
 			this.readIndex(); //还没有读取索引时先读取索引信息
 		}
+		int spamTotal = 0; //计数所有的spam类的文档个数
+		int hamTotal = 0;
+		for (int i = 0; i < this.isSpam.size(); i++) {
+			if (this.isSpam.get(i)) {
+				spamTotal++;
+			} else {
+				hamTotal++;
+			}
+		}
 		File file = null;
 		if (this.isFiltered) {
 			file = new File(Filter.filterPath);
@@ -135,7 +144,56 @@ public class Indexer {
 		}
 		try {
 			Scanner input = new Scanner(file);
-			Map<String,wordInfo> topWordList = new HashMap<String,wordInfo>(); //记录高频词的信息增益
+			Map<String,WordInfo> topWordList = new HashMap<String,WordInfo>(); //记录高频词的信息增益
+			while (input.hasNextLine()) {
+				String line = input.nextLine();
+				String[] splits = line.split(" ");
+				WordInfo info1 = new WordInfo();
+				topWordList.put(splits[0], info1);
+			}
+			for (int i = 0; i < this.indexPathes.size(); i++) {
+				//int i = 0;
+				String path = this.indexPathes.get(i);
+				//System.out.println("current path: "+path);
+				try {
+					Scanner input1 = new Scanner(new File(path));
+					//进入正文之前
+					while (input1.hasNextLine()) {
+						String line = input1.nextLine();
+						if (line.length() == 0) {
+							break;
+						}			
+					}
+					//进入正文之后
+					while (input1.hasNextLine()) {
+						String line = input1.nextLine();
+						String[] splits = line.split(" ");
+						for (int j = 0; j < splits.length; j++) {
+							if (splits[j].length() > 0 && topWordList.containsKey(splits[j])) {
+								if (this.isSpam.get(i)) {
+									topWordList.get(splits[j]).spamIncrease(i);
+								} else {
+									topWordList.get(splits[j]).hamIncrease(i);
+								}
+							}
+						}
+						//System.out.println(line);
+					}
+					input1.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if ((i+1) % 1000 == 0) {
+					System.out.println("has index "+(i+1)+" docs.");
+					System.out.println("current size: "+this.wordList.size());
+				}
+			}
+			System.out.println("has index all the documents");
+			System.out.println("current size: "+this.wordList.size());
+			for (Map.Entry<String, WordInfo> item: topWordList.entrySet()) {
+				item.getValue().calculateInfoGain(spamTotal, hamTotal);
+			}
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -147,8 +205,11 @@ public class Indexer {
 	public static void main(String[] args) {
 		Indexer index1 = new Indexer();
 		index1.readIndex();
-		//index1.setWordList();
-		//Filter.main(null);
+		if (index1.isFiltered) {
+			//index1.setWordList();
+			//Filter.main(null);
+		}
+		index1.reorderTopword();
 	}
 	
 

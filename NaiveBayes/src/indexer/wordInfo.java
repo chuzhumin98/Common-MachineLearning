@@ -6,15 +6,36 @@ package indexer;
  * @author chuzhumin
  *
  */
-public class wordInfo {
+public class WordInfo {
 	public int spamNum; //spam类出现在的文档个数
 	public int hamNum; //ham类出现在的文档个数
 	public double gain; //该term所带来的信息增益
+	public int spamLastIndex; //spam类的上一个文档索引
+	public int hamLastIndex; //ham类的上一个文档索引
 	
-	public wordInfo() {
+	public WordInfo() {
 		this.spamNum = 0;
 		this.hamNum = 0;
 		this.gain = 0.0;
+	}
+	
+	/**
+	 * 一个spam类文件第一次出现该词时才计数一次
+	 * 
+	 * @param index
+	 */
+	public void spamIncrease(int index) {
+		if (index > this.spamLastIndex) {
+			this.spamNum++;
+			this.spamLastIndex = index;
+		}	
+	}
+	
+	public void hamIncrease(int index) {
+		if (index > this.hamLastIndex) {
+			this.hamNum++;
+			this.hamLastIndex = index;
+		}
 	}
 	
 	/**
