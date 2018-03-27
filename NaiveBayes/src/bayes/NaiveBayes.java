@@ -21,6 +21,18 @@ public class NaiveBayes {
 	public int[][] featureCount; //记录各类训练集各维度的信息
 	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
+	public int[][] mailInfo;
+	public int[][] timeInfo;
+	public int[][] xMailerInfo;
+	
+	public boolean useMailInfo = false;
+	public boolean useTimeInfo = false;
+	public boolean useXMailerInfo = false;
+	
+	public double alphaMail = 10; //三部分额外信息的系数
+	public double alphaTime = 10;
+	public double alphaXMailer = 10;
+	
 	public NaiveBayes() {
 		this.LoadMatrix();
 		this.shuffleSample();
@@ -56,6 +68,16 @@ public class NaiveBayes {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 加载提取出来的其他信息的矩阵
+	 * 
+	 * @param path
+	 * @param matrix
+	 */
+	public void loadOtherFeature(String path, int[][] matrix) {
+		
 	}
 	
 	/**

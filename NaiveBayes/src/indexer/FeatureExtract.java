@@ -101,8 +101,10 @@ public class FeatureExtract {
 								break; //不可能同时属于多种邮箱
 							}
 						}
-						this.mailCount[spamIndex][this.mailName.length-1]++;
-						this.mailType[i][this.mailName.length-1] = 1;
+						if (isOther) {
+							this.mailCount[spamIndex][this.mailName.length-1]++;
+							this.mailType[i][this.mailName.length-1] = 1;
+						}
 					}
 					if (lineNum == 3) {
 						//System.out.println(line);
