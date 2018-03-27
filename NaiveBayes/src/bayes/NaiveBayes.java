@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class NaiveBayes {
-	//public static final String matrixPath = "output/featurematrix.txt";
-	public static final String matrixPath = "output/featurematrix_nonfilter.txt";
+	public static final String matrixPath = "output/featurematrix.txt";
+	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
 	public static final int trainSize = 45000; //训练集数据的大小
 	public static final int testStart = 45001; //测试集数据开始位置
@@ -146,6 +146,7 @@ public class NaiveBayes {
 			if (postProb[1] > postProb[0]) {
 				myLabel = 1;
 			}
+			//System.out.println(postProb[0]+" "+postProb[1]);
 			if (tempEntity.label == myLabel) {
 				countRight++;
 			}

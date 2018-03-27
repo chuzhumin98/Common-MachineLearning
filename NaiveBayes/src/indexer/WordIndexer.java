@@ -20,7 +20,7 @@ import java.util.Scanner;
 public class WordIndexer {
 	public final static String indexPath = "input/label/index_cut"; //index文件的地址
 	public final static String topWordPath = "output/topword.txt"; //存储出现次数最多的12000个term
-	public final static String reorderTopWordPath = "output/topwordreorder.txt"; //存储重排序后的热门词汇
+	public final static String reorderTopWordPath = "output/topwordreorder_500.txt"; //存储重排序后的热门词汇
 	public final static String reorderTopWordPath_nonfilter = "output/topwordreorder_nonfilter.txt"; //存储重排序后的热门词汇,未经过滤的
 	public final static int topWordSize = 12000; //这里我们仅输出12000个top的terms
 	public ArrayList<String> indexPathes; //用来记录各文件的地址ַ
@@ -68,6 +68,7 @@ public class WordIndexer {
 	 * 设置词项列表
 	 */
 	public void setWordList() {
+		int termCount = 0; //总的term个数
 		for (int i = 0; i < this.indexPathes.size(); i++) {
 			//int i = 0;
 			String path = this.indexPathes.get(i);
@@ -87,6 +88,7 @@ public class WordIndexer {
 					String[] splits = line.split(" ");
 					for (int j = 0; j < splits.length; j++) {
 						if (splits[j].length() > 0) {
+							termCount++;
 							if (this.wordList.containsKey(splits[j])) {
 								int count = this.wordList.get(splits[j])+1; //如果有这个term，直接+1
 								this.wordList.put(splits[j], count);
@@ -109,6 +111,7 @@ public class WordIndexer {
 		}
 		System.out.println("has index all the documents");
 		System.out.println("current size: "+this.wordList.size());
+		System.out.println("total term count:"+termCount);
 		// 对HashMap中的key 进行排序  
 		List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>(this.wordList.entrySet());
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
@@ -240,13 +243,13 @@ public class WordIndexer {
 	
 	public static void main(String[] args) {
 		WordIndexer index1 = new WordIndexer();
-		index1.setFilter(false);
+		index1.setFilter(true);
 		index1.readIndex();
+		//index1.setWordList();
 		if (index1.isFiltered) {
-			//index1.setWordList();
 			//Filter.main(null);
 		}
-		index1.reorderTopword(1000);
+		index1.reorderTopword(500);
 	}
 	
 

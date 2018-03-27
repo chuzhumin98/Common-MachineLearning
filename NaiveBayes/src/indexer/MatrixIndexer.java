@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class MatrixIndexer {
-	public static final String topWordPath = "output/topwordreorder.txt"; //使用的高频词表
+	public static final String topWordPath = "output/topwordreorder_500.txt"; //使用的高频词表
 	public static final String topWordPath_nonfilter = "output/topwordreorder_nonfilter.txt"; //使用的高频词表(未滤词)
-	public static final String featureMatrixPath = "output/featurematrix.txt"; //记录的文档-词项表
+	public static final String featureMatrixPath = "output/featurematrix_500.txt"; //记录的文档-词项表
 	public static final String featureMatrixPath_nonfilter = "output/featurematrix_nonfilter.txt"; //记录的文档-词项表
 	public WordIndexer wordIndex; //导入index地址文件
 	
@@ -93,7 +93,7 @@ public class MatrixIndexer {
 	
 	public static void main(String[] args) {
 		MatrixIndexer matrix1 = new MatrixIndexer();
-		matrix1.wordIndex.setFilter(false);
+		matrix1.wordIndex.setFilter(true);
 		matrix1.setFeatureMatrix();
 	}
 	
