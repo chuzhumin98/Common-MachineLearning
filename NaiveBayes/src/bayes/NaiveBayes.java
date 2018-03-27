@@ -11,7 +11,7 @@ import java.util.Scanner;
 import indexer.FeatureExtract;
 
 public class NaiveBayes {
-	public static final String matrixPath = "output/featurematrix.txt";
+	public static final String matrixPath = "output/featurematrix_5000.txt";
 	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
 	public static final int trainSize = 45000; //训练集数据的大小
@@ -32,12 +32,12 @@ public class NaiveBayes {
 	public int[][] xMailerCount;
 	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
-	public boolean useMailInfo = false;
-	public boolean useTimeInfo = false;
-	public boolean useXMailerInfo = false;
+	public boolean useMailInfo = true;
+	public boolean useTimeInfo = true;
+	public boolean useXMailerInfo = true;
 	
 	public double alphaMail = 10; //三部分额外信息的系数
-	public double alphaTime = 10;
+	public double alphaTime = 1;
 	public double alphaXMailer = 10;
 	
 	public NaiveBayes() {
@@ -45,6 +45,9 @@ public class NaiveBayes {
 		this.loadOtherFeature(FeatureExtract.mailPath, 0);
 		this.loadOtherFeature(FeatureExtract.timePath, 1);
 		this.loadOtherFeature(FeatureExtract.xMailerPath, 2);
+		this.mailNum = this.entities.get(0).mail.length;
+		this.timeNum = this.entities.get(0).time.length;
+		this.xMailerNum = this.entities.get(0).xMailer.length;
 		this.shuffleSample();
 	}
 	
@@ -118,9 +121,6 @@ public class NaiveBayes {
 					index++;
 				}
 			}
-			this.mailNum = this.entities.get(0).mail.length;
-			this.timeNum = this.entities.get(0).time.length;
-			this.xMailerNum = this.entities.get(0).xMailer.length;
 			input.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -232,7 +232,37 @@ public class NaiveBayes {
 				}
 			}
 			if (this.useMailInfo) {
-				
+				for (int j = 0; j < this.mailNum; j++) {
+					if (tempEntity.mail[j] > 0) {
+						for (int k = 0; k < 2; k++) {
+							double prob = (this.mailCount[k][j]+this.alpha)
+									/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+							postProb[k] += this.alphaMail*Math.log(prob); //计算对数化后的概率
+						}
+					}
+				}
+			}
+			if (this.useTimeInfo) {
+				for (int j = 0; j < this.timeNum; j++) {
+					if (tempEntity.time[j] > 0) {
+						for (int k = 0; k < 2; k++) {
+							double prob = (this.timeCount[k][j]+this.alpha)
+									/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+							postProb[k] += this.alphaTime*Math.log(prob); //计算对数化后的概率
+						}
+					}
+				}
+			}
+			if (this.useXMailerInfo) {
+				for (int j = 0; j < this.xMailerNum; j++) {
+					if (tempEntity.xMailer[j] > 0) {
+						for (int k = 0; k < 2; k++) {
+							double prob = (this.xMailerCount[k][j]+this.alpha)
+									/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+							postProb[k] += this.alphaXMailer*Math.log(prob); //计算对数化后的概率
+						}
+					}
+				}
 			}
 			int myLabel = 0;
 			if (postProb[1] > postProb[0]) {
