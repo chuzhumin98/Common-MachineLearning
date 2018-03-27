@@ -96,17 +96,25 @@ public class NaiveBayes {
 				String line = input.nextLine();
 				String[] splits = line.split(" ");
 				if (splits.length > 0) {
-					int[] vector = new int [splits.length];
-					for (int i = 0; i < splits.length; i++) {
-						vector[i] = Integer.valueOf(splits[i]);
-					}
 					if (type == 0) {
-						this.entities.get(index).mail = vector;
+						this.entities.get(index).mail = new int [splits.length];
+						for (int i = 0; i < splits.length; i++) {
+							this.entities.get(index).mail[i] = Integer.valueOf(splits[i]);
+						}
 					} else if (type == 1) {
-						this.entities.get(index).time = vector;
+						this.entities.get(index).time = new int [splits.length];
+						for (int i = 0; i < splits.length; i++) {
+							this.entities.get(index).time[i] = Integer.valueOf(splits[i]);
+						}
 					} else {
-						this.entities.get(index).xMailer = vector;
+						this.entities.get(index).xMailer = new int [splits.length];
+						for (int i = 0; i < splits.length; i++) {
+							this.entities.get(index).xMailer[i] = Integer.valueOf(splits[i]);
+						}
 					}
+					
+					
+					
 					index++;
 				}
 			}
