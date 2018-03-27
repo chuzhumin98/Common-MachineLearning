@@ -2,13 +2,18 @@ package indexer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.Scanner;
 
 public class FeatureExtract {
 	public WordIndexer wordIndex; //记录index地址
-	public String[] mailName = {"edu","126.com","163.com","qq","sina","sohu","yahoo","microsoft"};
+	public static final String mailPath = "output/mailMatrix.txt";
+	public static final String timePath = "output/timeMatrix.txt";
+	public static final String xMailerPath = "output/xMailerMatrix.txt";
+	
+	public String[] mailName = {"edu","126.com","163.com","qq","sina","sohu","yahoo","microsoft","other"};
 	public int[][] mailCount; //第一维度是垃圾邮件类型，第二维度为邮箱类型，记录各邮箱类型维度的信息情况
-	public int[][] mailType; //依次判断是否为edu,126,163,qq,sina,sohu,yahoo,microsoft邮箱
+	public int[][] mailType; //依次判断是否为edu,126,163,qq,sina,sohu,yahoo,microsoft邮箱或其他邮箱
 	
 	public int[][] timeCount; //第一维度是垃圾邮件类型，第二维度为时间0~23小时数，记录各时间维度信息
 	public int[][] timeType; //该邮件的发送时间是否为i小时
@@ -55,7 +60,6 @@ public class FeatureExtract {
 			}
 			this.xMailerType[i][this.xMailerName.length-1] = 1;
 		}
-		this.getMailFeature();
 	}
 	
 	public void getMailFeature() {
@@ -88,13 +92,17 @@ public class FeatureExtract {
 					}
 					if (lineNum == 1) {
 						//System.out.println(line);
-						for (int j = 0; j < this.mailName.length; j++) {
+						boolean isOther = true; //记录是否为其他类型的邮箱
+						for (int j = 0; j < this.mailName.length-1; j++) {
 							if (line.contains(this.mailName[j])) {
 								this.mailCount[spamIndex][j]++;
 								this.mailType[i][j] = 1; //1表示为该类型邮箱
+								isOther = false;
 								break; //不可能同时属于多种邮箱
 							}
 						}
+						this.mailCount[spamIndex][this.mailName.length-1]++;
+						this.mailType[i][this.mailName.length-1] = 1;
 					}
 					if (lineNum == 3) {
 						//System.out.println(line);
@@ -145,7 +153,35 @@ public class FeatureExtract {
 		}
 	}
 	
+	/**
+	 * 将提取的新的特征写入文件中
+	 * 
+	 * @param path
+	 * @param matrix
+	 */
+	public void writeFeatureMatrix(String path, int[][] matrix) {
+		try {
+			PrintStream output = new PrintStream(new File(path));
+			for (int i = 0; i < matrix.length; i++) {
+				String line = "";
+				for (int j = 0; j < matrix[i].length-1; j++) {
+					line += matrix[i][j]+" ";
+				}
+				line += matrix[i][matrix[i].length-1];
+				output.println(line);
+			}
+			output.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 		FeatureExtract extract = new FeatureExtract();
+		extract.getMailFeature();
+		extract.writeFeatureMatrix(FeatureExtract.mailPath, extract.mailType);
+		extract.writeFeatureMatrix(FeatureExtract.timePath, extract.timeType);
+		extract.writeFeatureMatrix(FeatureExtract.xMailerPath, extract.xMailerType);
 	}
 }
