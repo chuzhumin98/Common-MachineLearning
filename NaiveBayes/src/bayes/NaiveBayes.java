@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import indexer.FeatureExtract;
+
 public class NaiveBayes {
 	public static final String matrixPath = "output/featurematrix.txt";
 	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
@@ -21,10 +23,6 @@ public class NaiveBayes {
 	public int[][] featureCount; //记录各类训练集各维度的信息
 	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
-	public int[][] mailInfo;
-	public int[][] timeInfo;
-	public int[][] xMailerInfo;
-	
 	public boolean useMailInfo = false;
 	public boolean useTimeInfo = false;
 	public boolean useXMailerInfo = false;
@@ -35,6 +33,9 @@ public class NaiveBayes {
 	
 	public NaiveBayes() {
 		this.LoadMatrix();
+		this.loadOtherFeature(FeatureExtract.mailPath, 0);
+		this.loadOtherFeature(FeatureExtract.timePath, 1);
+		this.loadOtherFeature(FeatureExtract.xMailerPath, 2);
 		this.shuffleSample();
 	}
 	
@@ -72,12 +73,38 @@ public class NaiveBayes {
 	
 	/**
 	 * 加载提取出来的其他信息的矩阵
+	 * type:0为mail,1为time,2为xMailer
 	 * 
 	 * @param path
 	 * @param matrix
 	 */
-	public void loadOtherFeature(String path, int[][] matrix) {
-		
+	public void loadOtherFeature(String path, int type) {
+		try {
+			Scanner input = new Scanner(new File(path));
+			int index = 0; //现在的doc索引号
+			int length = 0; //特征的长度
+			while (input.hasNextLine()) {
+				String line = input.nextLine();
+				String[] splits = line.split(" ");
+				if (splits.length > 0) {
+					int[] vector = new int [splits.length];
+					for (int i = 0; i < splits.length; i++) {
+						vector[i] = Integer.valueOf(splits[i]);
+					}
+					if (type == 0) {
+						this.entities.get(index).mail = vector;
+					} else if (type == 1) {
+						this.entities.get(index).time = vector;
+					} else {
+						this.entities.get(index).xMailer = vector;
+					}
+					index++;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
 	}
 	
 	/**
@@ -271,6 +298,9 @@ public class NaiveBayes {
 	
 	public class Entity {
 		public int[] feature; //特征向量
+		public int[] mail;
+		public int[] time;
+		public int[] xMailer;
 		public int label; //实体的标签，1为spam，0为ham
 		public Entity(int[] feature1, int label1) {
 			this.feature = feature1;
