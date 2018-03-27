@@ -9,7 +9,9 @@ import java.util.Scanner;
 
 public class MatrixIndexer {
 	public static final String topWordPath = "output/topwordreorder.txt"; //使用的高频词表
+	public static final String topWordPath_nonfilter = "output/topwordreorder_nonfilter.txt"; //使用的高频词表(未滤词)
 	public static final String featureMatrixPath = "output/featurematrix.txt"; //记录的文档-词项表
+	public static final String featureMatrixPath_nonfilter = "output/featurematrix_nonfilter.txt"; //记录的文档-词项表
 	public WordIndexer wordIndex; //导入index地址文件
 	
 	public MatrixIndexer() {
@@ -19,8 +21,15 @@ public class MatrixIndexer {
 	
 	public void setFeatureMatrix() {
 		try {
-			PrintStream output = new PrintStream(new File(MatrixIndexer.featureMatrixPath));
-			Scanner input = new Scanner(new File(MatrixIndexer.topWordPath));
+			PrintStream output = null;
+			Scanner input = null;
+			if (this.wordIndex.isFiltered) {
+				 output = new PrintStream(new File(MatrixIndexer.featureMatrixPath));
+				 input = new Scanner(new File(MatrixIndexer.topWordPath));
+			} else {
+				 output = new PrintStream(new File(MatrixIndexer.featureMatrixPath_nonfilter));
+				 input = new Scanner(new File(MatrixIndexer.topWordPath_nonfilter));
+			}
 			Map<String, Integer> topWordCount = new HashMap<String, Integer>(); //记录高频词在某个文档中出现的次数
 			/**
 			 * 这一部分导入高频词到哈希表中
@@ -84,6 +93,7 @@ public class MatrixIndexer {
 	
 	public static void main(String[] args) {
 		MatrixIndexer matrix1 = new MatrixIndexer();
+		matrix1.wordIndex.setFilter(false);
 		matrix1.setFeatureMatrix();
 	}
 	

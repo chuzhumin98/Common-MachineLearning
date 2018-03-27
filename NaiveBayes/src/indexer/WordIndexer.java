@@ -21,6 +21,7 @@ public class WordIndexer {
 	public final static String indexPath = "input/label/index_cut"; //index文件的地址
 	public final static String topWordPath = "output/topword.txt"; //存储出现次数最多的12000个term
 	public final static String reorderTopWordPath = "output/topwordreorder.txt"; //存储重排序后的热门词汇
+	public final static String reorderTopWordPath_nonfilter = "output/topwordreorder_nonfilter.txt"; //存储重排序后的热门词汇,未经过滤的
 	public final static int topWordSize = 12000; //这里我们仅输出12000个top的terms
 	public ArrayList<String> indexPathes; //用来记录各文件的地址ַ
 	public ArrayList<Boolean> isSpam; //用来存储这些文件对应的是不是垃圾邮件
@@ -30,6 +31,10 @@ public class WordIndexer {
 	public WordIndexer() {
 		indexPathes = new ArrayList<String>();
 		isSpam = new ArrayList<Boolean>();
+	}
+	
+	public void setFilter(boolean isFilter) {
+		this.isFiltered = isFilter;
 	}
 	
 	/**
@@ -212,7 +217,12 @@ public class WordIndexer {
 	            }  
 	        }); 
 	        try {
-				PrintStream output = new PrintStream(new File(WordIndexer.reorderTopWordPath));
+				PrintStream output = null;
+				if (this.isFiltered) {
+					output = new PrintStream(new File(WordIndexer.reorderTopWordPath));
+				} else {
+					output = new PrintStream(new File(WordIndexer.reorderTopWordPath_nonfilter));
+				}
 				for (int i = 0; i < size; i++) {
 					output.println(list.get(i).getKey()+" "+list.get(i).getValue().gain
 							+" "+list.get(i).getValue().count);
@@ -230,6 +240,7 @@ public class WordIndexer {
 	
 	public static void main(String[] args) {
 		WordIndexer index1 = new WordIndexer();
+		index1.setFilter(false);
 		index1.readIndex();
 		if (index1.isFiltered) {
 			//index1.setWordList();

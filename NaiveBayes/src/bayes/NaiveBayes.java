@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class NaiveBayes {
-	public static final String matrixPath = "output/featurematrix.txt";
+	//public static final String matrixPath = "output/featurematrix.txt";
+	public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
 	public static final int trainSize = 45000; //训练集数据的大小
 	public static final int testStart = 45001; //测试集数据开始位置
@@ -102,7 +103,7 @@ public class NaiveBayes {
 		//训练结果输出展示
 		System.out.println("spam doc size:"+this.classCount[1]);
 		System.out.println("ham doc size:"+this.classCount[0]);
-		System.out.println("for spam type:");
+		/*System.out.println("for spam type:");
 		for (int i = 0; i < this.featureNum; i++) {
 			System.out.print(this.featureCount[1][i]+" ");
 		}
@@ -111,7 +112,7 @@ public class NaiveBayes {
 		for (int i = 0; i < this.featureNum; i++) {
 			System.out.print(this.featureCount[0][i]+" ");
 		}
-		System.out.println();
+		System.out.println(); */
 	}
 	
 	/**
@@ -241,7 +242,7 @@ public class NaiveBayes {
 		//int high = bayes.trainSize;
 		int low = bayes.testStart;
 		int high = bayes.docSize;
-		int right = bayes.testModel3(low, high);
+		int right = bayes.testModel1(low, high);
 		System.out.println("correct "+right+" of "+(high-low)+", eta = "+(right*1.0/(high-low)));
 	}
 	
