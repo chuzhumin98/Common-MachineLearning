@@ -18,9 +18,18 @@ public class NaiveBayes {
 	public static final int testStart = 45001; //测试集数据开始位置
 	public double alpha = 1.0 / Math.sqrt(trainSize); //设置平滑系数
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
+	
 	public int featureNum; //特征的维度
+	public int mailNum; //mail特征的维度
+	public int timeNum;
+	public int xMailerNum;
+	
 	public ArrayList<Integer> sampleIndex; //样本的索引，前trainsize个为训练集，testsize之后为测试集
+	
 	public int[][] featureCount; //记录各类训练集各维度的信息
+	public int[][] mailCount; //记录mail特征在各类中的信息
+	public int[][] timeCount; 
+	public int[][] xMailerCount;
 	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
 	public boolean useMailInfo = false;
@@ -101,6 +110,10 @@ public class NaiveBayes {
 					index++;
 				}
 			}
+			this.mailNum = this.entities.get(0).mail.length;
+			this.timeNum = this.entities.get(0).time.length;
+			this.xMailerNum = this.entities.get(0).xMailer.length;
+			input.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,6 +143,9 @@ public class NaiveBayes {
 		 */
 		this.classCount = new int [2];
 		this.featureCount = new int [2][this.featureNum];
+		this.mailCount = new int [2][this.mailNum];
+		this.timeCount = new int [2][this.timeNum];
+		this.xMailerCount = new int [2][this.xMailerNum];
 		for (int i = 0; i < 2; i++) {
 			this.classCount[i] = 0;
 			for (int j = 0; j < this.featureNum; j++) {
@@ -142,10 +158,26 @@ public class NaiveBayes {
 		for (int i = 0; i < this.trainSize; i++) {
 			int index = this.sampleIndex.get(i); //随机化的第i个样本点
 			Entity tempEntity = this.entities.get(index);
-			this.classCount[tempEntity.label]++; //对应的类型文档数加一
+			int myLabel = tempEntity.label;
+			this.classCount[myLabel]++; //对应的类型文档数加一
 			for (int j = 0; j < this.featureNum; j++) {
 				if (tempEntity.feature[j] > 0) { 
-					this.featureCount[tempEntity.label][j]++; //该为特征中有值则记入
+					this.featureCount[myLabel][j]++; //该为特征中有值则记入
+				}
+			}
+			for (int j = 0; j < this.mailNum; j++) {
+				if (tempEntity.mail[j] > 0) {
+					this.mailCount[myLabel][j]++;
+				}
+			}
+			for (int j = 0; j < this.timeNum; j++) {
+				if (tempEntity.time[j] > 0) {
+					this.timeCount[myLabel][j]++;
+				}
+			}
+			for (int j = 0; j < this.xMailerNum; j++) {
+				if (tempEntity.xMailer[j] > 0) {
+					this.xMailerCount[myLabel][j]++;
 				}
 			}
 		}
@@ -190,6 +222,9 @@ public class NaiveBayes {
 						postProb[k] += Math.log(prob); //计算对数化后的概率
 					}
 				}
+			}
+			if (this.useMailInfo) {
+				
 			}
 			int myLabel = 0;
 			if (postProb[1] > postProb[0]) {
