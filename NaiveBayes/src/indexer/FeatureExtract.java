@@ -37,7 +37,12 @@ public class FeatureExtract {
 			for (int j = 0; j < 24; j++) {
 				this.timeCount[i][j] = 0;
 			}
+			for (int j = 0; j < this.xMailerName.length-1; j++) {
+				this.xMailerCount[i][j] = 0;
+			}
 		}
+		this.xMailerCount[0][this.xMailerName.length-1] = 21766;
+		this.xMailerCount[1][this.xMailerName.length-1] = 42854;
 		for (int i = 0; i < this.wordIndex.isSpam.size(); i++) {
 			for (int j = 0; j < this.mailType[i].length; j++) {
 				this.mailType[i][j] = 0; //默认不为该种邮箱
@@ -45,13 +50,17 @@ public class FeatureExtract {
 			for (int j = 0; j < 24; j++) {
 				this.timeType[i][j] = 0; //默认不为该时间段
 			}
+			for (int j = 0; j < this.xMailerName.length-1; j++) {
+				this.xMailerType[i][j] = 0; //默认不含有XMailer
+			}
+			this.xMailerType[i][this.xMailerName.length-1] = 1;
 		}
 		this.getMailFeature();
 	}
 	
 	public void getMailFeature() {
 		int xMailer = 0; //统计共有多少个XMailer项
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < this.wordIndex.indexPathes.size(); i++) {
 			int spamIndex = 0; //记录该文档的属性信息
 			if (this.wordIndex.isSpam.get(i)) {
 				spamIndex = 1; //如果是spam则index为1，否则为0
@@ -66,8 +75,16 @@ public class FeatureExtract {
 					String line = input.nextLine();
 					lineNum++; 
 					if (line.contains("X-Mailer")) {
-						System.out.println(line);
+						//System.out.println(line);
 						xMailer++;
+						for (int j = 0; j < this.xMailerName.length-1; j++) {
+							if (line.contains(this.xMailerName[j])) {
+								this.xMailerCount[spamIndex][j]++;
+								this.xMailerType[i][j] = 1;
+							}
+						}
+						this.xMailerCount[spamIndex][this.xMailerName.length-1]--;
+						this.xMailerType[i][this.xMailerName.length-1] = 0;
 					}
 					if (lineNum == 1) {
 						//System.out.println(line);
@@ -118,6 +135,11 @@ public class FeatureExtract {
 			System.out.print("hour type:");
 			for (int j = 0; j < 24; j++) {
 				System.out.print(this.timeCount[i][j]+" ");
+			}
+			System.out.println();
+			System.out.print("XMailer type:");
+			for (int j = 0; j < this.xMailerName.length; j++) {
+				System.out.print(this.xMailerCount[i][j]+" ");
 			}
 			System.out.println();
 		}
