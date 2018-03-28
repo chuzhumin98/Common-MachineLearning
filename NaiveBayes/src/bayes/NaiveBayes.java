@@ -298,9 +298,14 @@ public class NaiveBayes {
 				countRight++;
 			}
 		}
-		System.out.println("only P(.|ham)=0, Num: "+infiniteCount[0][0]+" , accuracy = "+(1.0*infiniteCount[0][1]/infiniteCount[0][0]));
-		System.out.println("only P(.|spam)=0, Num: "+infiniteCount[1][0]+" , accuracy = "+(1.0*infiniteCount[1][1]/infiniteCount[1][0]));
-		System.out.println("both P(.|ham/spam)=0, Num: "+infiniteCount[2][0]+" , accuracy = "+(1.0*infiniteCount[2][1]/infiniteCount[2][0]));
+		if (this.alpha < 1e-14) {
+			System.out.println("only P(.|ham)=0, Num: "+infiniteCount[0][0]
+					+" , accuracy = "+(1.0*infiniteCount[0][1]/infiniteCount[0][0]));
+			System.out.println("only P(.|spam)=0, Num: "+infiniteCount[1][0]
+					+" , accuracy = "+(1.0*infiniteCount[1][1]/infiniteCount[1][0]));
+			System.out.println("both P(.|ham/spam)=0, Num: "+infiniteCount[2][0]
+					+" , accuracy = "+(1.0*infiniteCount[2][1]/infiniteCount[2][0]));
+		}
 		return evaluateTable;
 	}
 	
