@@ -182,8 +182,8 @@ public class FeatureExtract {
 	public static void main(String[] args) {
 		FeatureExtract extract = new FeatureExtract();
 		extract.getMailFeature();
-		extract.writeFeatureMatrix(FeatureExtract.mailPath, extract.mailType);
-		extract.writeFeatureMatrix(FeatureExtract.timePath, extract.timeType);
-		extract.writeFeatureMatrix(FeatureExtract.xMailerPath, extract.xMailerType);
+		//extract.writeFeatureMatrix(FeatureExtract.mailPath, extract.mailType);
+		//extract.writeFeatureMatrix(FeatureExtract.timePath, extract.timeType);
+		//extract.writeFeatureMatrix(FeatureExtract.xMailerPath, extract.xMailerType);
 	}
 }

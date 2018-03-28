@@ -32,13 +32,13 @@ public class NaiveBayes {
 	public int[][] xMailerCount;
 	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
-	public boolean useMailInfo = false;
+	public boolean useMailInfo = true; ////是否使用邮箱信息
 	public boolean useTimeInfo = false;
-	public boolean useXMailerInfo = false;
+	public boolean useXMailerInfo = true;
 	
-	public double alphaMail = 10; //三部分额外信息的系数
+	public double alphaMail = 6; //邮箱提供信息的权重
 	public double alphaTime = 1;
-	public double alphaXMailer = 10;
+	public double alphaXMailer = 8;
 	
 	public NaiveBayes() {
 		this.LoadMatrix();
@@ -600,7 +600,7 @@ public class NaiveBayes {
 		//int high = bayes.trainSize;
 		int low = bayes.testStart;
 		int high = bayes.docSize;
-		int[][] table = bayes.testModel1_1(low, high); //采用模型1进行预测
+		int[][] table = bayes.testModel1(low, high); //采用模型1进行预测
 		double accuracy = 1.0 * (table[0][0]+table[1][1]) / (table[0][0]+table[0][1]+table[1][0]+table[1][1]);
 		double precision = 1.0 * table[1][1] / (table[0][1]+table[1][1]);
 		double recall = 1.0 * table[1][1] / (table[1][0]+table[1][1]);
