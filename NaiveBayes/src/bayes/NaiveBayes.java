@@ -76,7 +76,7 @@ public class NaiveBayes {
 			}
 			this.docSize = this.entities.size();
 			System.out.println("feature num:"+this.featureNum);
-			System.out.println("doc size:"+this.docSize);
+			System.out.println("total doc size:"+this.docSize);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -190,8 +190,8 @@ public class NaiveBayes {
 			}
 		}
 		//训练结果输出展示
-		System.out.println("spam doc size:"+this.classCount[1]);
-		System.out.println("ham doc size:"+this.classCount[0]);
+		System.out.println("train spam doc size:"+this.classCount[1]);
+		System.out.println("train ham doc size:"+this.classCount[0]);
 		/*System.out.println("for spam type:");
 		for (int i = 0; i < this.featureNum; i++) {
 			System.out.print(this.featureCount[1][i]+" ");
@@ -213,8 +213,14 @@ public class NaiveBayes {
 	 * @param high
 	 * @return
 	 */
-	public int testModel1(int low, int high) {
+	public int[][] testModel1(int low, int high) {
 		int countRight = 0;
+		int[][] evaluateTable = new int [2][2]; //第一维记录真实类别，第二维记录分类类别，0为ham，1为spam
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				evaluateTable[i][j] = 0;
+			}
+		}
 		for (int i = low; i < high; i++) {
 			int index = this.sampleIndex.get(i); //随机化的第i个样本点
 			Entity tempEntity = this.entities.get(index);
@@ -268,12 +274,13 @@ public class NaiveBayes {
 			if (postProb[1] > postProb[0]) {
 				myLabel = 1;
 			}
+			evaluateTable[tempEntity.label][myLabel]++; //向表中计数
 			//System.out.println(postProb[0]+" "+postProb[1]);
 			if (tempEntity.label == myLabel) {
 				countRight++;
 			}
 		}
-		return countRight;
+		return evaluateTable;
 	}
 	
 	/**
@@ -431,8 +438,16 @@ public class NaiveBayes {
 		//int high = bayes.trainSize;
 		int low = bayes.testStart;
 		int high = bayes.docSize;
-		int right = bayes.testModel1(low, high);
-		System.out.println("correct "+right+" of "+(high-low)+", eta = "+(right*1.0/(high-low)));
+		int[][] table = bayes.testModel1(low, high);
+		double accuracy = 1.0 * (table[0][0]+table[1][1]) / (table[0][0]+table[0][1]+table[1][0]+table[1][1]);
+		double precision = 1.0 * table[1][1] / (table[0][1]+table[1][1]);
+		double recall = 1.0 * table[1][1] / (table[1][0]+table[1][1]);
+		double f1Measure = 2.0*precision*recall/(precision+recall);
+		System.out.println("test doc size:"+(high-low));
+		System.out.println("model accuracy = "+accuracy);
+		System.out.println("model precision = "+precision);
+		System.out.println("model recall = "+recall);
+		System.out.println("model F1-Measure = "+f1Measure);
 	}
 	
 	public class Entity {
