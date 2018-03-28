@@ -14,7 +14,7 @@ public class NaiveBayes {
 	public static final String matrixPath = "output/featurematrix.txt";
 	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
-	public static final int trainSize = 4500; //训练集数据的大小
+	public static final int trainSize = 45000; //训练集数据的大小
 	public static final int testStart = 45001; //测试集数据开始位置
 	public double alpha = 0; //设置平滑系数
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
@@ -215,6 +215,7 @@ public class NaiveBayes {
 	 */
 	public int[][] testModel1(int low, int high) {
 		int countRight = 0;
+		int[][] infiniteCount = new int [3][2]; //第一维：0-仅ham P=0,1~仅spam P=0,2~P均为0; 第二维：0-总数,1-分对的个数
 		int[][] evaluateTable = new int [2][2]; //第一维记录真实类别，第二维记录分类类别，0为ham，1为spam
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
@@ -275,11 +276,31 @@ public class NaiveBayes {
 				myLabel = 1;
 			}
 			evaluateTable[tempEntity.label][myLabel]++; //向表中计数
+			if (this.alpha < 1e-14) {
+				//System.out.println(postProb[0] + " " + postProb[1]);
+				int index1 = -1;
+				if (postProb[0] == Double.NEGATIVE_INFINITY && postProb[1] == Double.NEGATIVE_INFINITY) {
+					index1 = 2;
+				} else if (postProb[0] == Double.NEGATIVE_INFINITY) {
+					index1 = 0;
+				} else if (postProb[1] == Double.NEGATIVE_INFINITY) {
+					index1 = 1;
+				}
+				if (index1 >= 0) {
+					infiniteCount[index1][0]++;
+					if (tempEntity.label == myLabel) {
+						infiniteCount[index1][1]++;
+					}
+				}
+			}
 			//System.out.println(postProb[0]+" "+postProb[1]);
 			if (tempEntity.label == myLabel) {
 				countRight++;
 			}
 		}
+		System.out.println("only P(.|ham)=0, Num: "+infiniteCount[0][0]+" , accuracy = "+(1.0*infiniteCount[0][1]/infiniteCount[0][0]));
+		System.out.println("only P(.|spam)=0, Num: "+infiniteCount[1][0]+" , accuracy = "+(1.0*infiniteCount[1][1]/infiniteCount[1][0]));
+		System.out.println("both P(.|ham/spam)=0, Num: "+infiniteCount[2][0]+" , accuracy = "+(1.0*infiniteCount[2][1]/infiniteCount[2][0]));
 		return evaluateTable;
 	}
 	
