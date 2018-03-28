@@ -69,6 +69,10 @@ public class WordIndexer {
 	 */
 	public void setWordList() {
 		int termCount = 0; //总的term个数
+		int[] termCountwithType = new int [2]; //按照类别统计词项数
+		for (int i = 0; i < 2;  i++) {
+			termCountwithType[i] = 0;
+		}
 		for (int i = 0; i < this.indexPathes.size(); i++) {
 			//int i = 0;
 			String path = this.indexPathes.get(i);
@@ -89,6 +93,11 @@ public class WordIndexer {
 					for (int j = 0; j < splits.length; j++) {
 						if (splits[j].length() > 0) {
 							termCount++;
+							if (this.isSpam.get(i)) {
+								termCountwithType[1]++; 
+							} else {
+								termCountwithType[0]++;
+							}
 							if (this.wordList.containsKey(splits[j])) {
 								int count = this.wordList.get(splits[j])+1; //如果有这个term，直接+1
 								this.wordList.put(splits[j], count);
@@ -112,6 +121,8 @@ public class WordIndexer {
 		System.out.println("has index all the documents");
 		System.out.println("current size: "+this.wordList.size());
 		System.out.println("total term count:"+termCount);
+		System.out.println("spam total term size:"+termCountwithType[1]);
+		System.out.println("ham total term size:"+termCountwithType[0]);
 		// 对HashMap中的key 进行排序  
 		List<Map.Entry<String,Integer>> list = new ArrayList<Map.Entry<String,Integer>>(this.wordList.entrySet());
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {  
@@ -245,11 +256,11 @@ public class WordIndexer {
 		WordIndexer index1 = new WordIndexer();
 		index1.setFilter(true);
 		index1.readIndex();
-		//index1.setWordList();
+		index1.setWordList();
 		if (index1.isFiltered) {
 			//Filter.main(null);
 		}
-		index1.reorderTopword(500);
+		//index1.reorderTopword(500);
 	}
 	
 
