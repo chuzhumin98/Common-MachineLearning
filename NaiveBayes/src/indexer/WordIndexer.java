@@ -20,7 +20,7 @@ import java.util.Scanner;
 public class WordIndexer {
 	public final static String indexPath = "input/label/index_cut"; //index文件的地址
 	public final static String topWordPath = "output/topword.txt"; //存储出现次数最多的12000个term
-	public final static String reorderTopWordPath = "output/topwordreorder_200.txt"; //存储重排序后的热门词汇
+	public final static String reorderTopWordPath = "output/topwordreorder.txt"; //存储重排序后的热门词汇
 	public final static String reorderTopWordPath_nonfilter = "output/topwordreorder_nonfilter.txt"; //存储重排序后的热门词汇,未经过滤的
 	public final static int topWordSize = 12000; //这里我们仅输出12000个top的terms
 	public ArrayList<String> indexPathes; //用来记录各文件的地址ַ
@@ -256,11 +256,11 @@ public class WordIndexer {
 		WordIndexer index1 = new WordIndexer();
 		index1.setFilter(true);
 		index1.readIndex();
-		//index1.setWordList();
+		index1.setWordList();
 		if (index1.isFiltered) {
-		//	Filter.main(null);
+			Filter.main(null);
 		}
-		index1.reorderTopword(200);
+		index1.reorderTopword(1000);
 	}
 	
 
