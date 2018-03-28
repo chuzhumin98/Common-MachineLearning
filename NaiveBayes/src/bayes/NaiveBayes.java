@@ -292,8 +292,14 @@ public class NaiveBayes {
 	 * @param high
 	 * @return
 	 */
-	public int testModel2(int low, int high) {
+	public int[][] testModel2(int low, int high) {
 		int countRight = 0;
+		int[][] evaluateTable = new int [2][2]; //第一维记录真实类别，第二维记录分类类别，0为ham，1为spam
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				evaluateTable[i][j] = 0;
+			}
+		}
 		for (int i = low; i < high; i++) {
 			int index = this.sampleIndex.get(i); //随机化的第i个样本点
 			Entity tempEntity = this.entities.get(index);
@@ -347,11 +353,12 @@ public class NaiveBayes {
 			if (postProb[1] > postProb[0]) {
 				myLabel = 1;
 			}
+			evaluateTable[tempEntity.label][myLabel]++; //向表中计数
 			if (tempEntity.label == myLabel) {
 				countRight++;
 			}
 		}
-		return countRight;
+		return evaluateTable;
 	}
 	
 	/**
@@ -363,8 +370,14 @@ public class NaiveBayes {
 	 * @param high
 	 * @return
 	 */
-	public int testModel3(int low, int high) {
+	public int[][] testModel3(int low, int high) {
 		int countRight = 0;
+		int[][] evaluateTable = new int [2][2]; //第一维记录真实类别，第二维记录分类类别，0为ham，1为spam
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				evaluateTable[i][j] = 0;
+			}
+		}
 		for (int i = low; i < high; i++) {
 			int index = this.sampleIndex.get(i); //随机化的第i个样本点
 			Entity tempEntity = this.entities.get(index);
@@ -424,11 +437,12 @@ public class NaiveBayes {
 			if (postProb[1] > postProb[0]) {
 				myLabel = 1;
 			}
+			evaluateTable[tempEntity.label][myLabel]++; //向表中计数
 			if (tempEntity.label == myLabel) {
 				countRight++;
 			}
 		}
-		return countRight;
+		return evaluateTable;
 	}
 	
 	public static void main(String[] args) {
