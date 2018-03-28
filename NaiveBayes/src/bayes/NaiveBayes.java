@@ -16,7 +16,7 @@ public class NaiveBayes {
 	public int docSize = 64620; //总的文档个数
 	public static final int trainSize = 45000; //训练集数据的大小
 	public static final int testStart = 45001; //测试集数据开始位置
-	public double alpha = 0; //设置平滑系数
+	public double alpha = 1/Math.sqrt(trainSize); //设置平滑系数
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
 	
 	public int featureNum; //特征的维度
@@ -471,6 +471,128 @@ public class NaiveBayes {
 		return evaluateTable;
 	}
 	
+	/**
+	 * 在Model1的基础上改进的版本，可变调节alpha
+	 * index在[low,high)之间的样本
+	 * 不带加权信息的，普通Naive Bayes
+	 * 返回正确分类的个数
+	 * 
+	 * @param low
+	 * @param high
+	 * @return
+	 */
+	public int[][] testModel1_1(int low, int high) {
+		int countRight = 0;
+		int[][] infiniteCount = new int [3][2]; //第一维：0-仅ham P=0,1~仅spam P=0,2~P均为0; 第二维：0-总数,1-分对的个数
+		int[][] evaluateTable = new int [2][2]; //第一维记录真实类别，第二维记录分类类别，0为ham，1为spam
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				evaluateTable[i][j] = 0;
+			}
+		}
+		for (int i = low; i < high; i++) {
+			int myLabel = 0; //该样本所属的类别
+			int index = this.sampleIndex.get(i); //随机化的第i个样本点
+			Entity tempEntity = this.entities.get(index);
+			double[] postProb = new double [2]; //对数化的后验概率
+			for (int j = 0; j < 2; j++) {
+				postProb[j] = Math.log(this.classCount[j]*1.0/this.trainSize); //先验概率
+			}
+			boolean[] hasZero = {false, false}; //记录两个类别是否存在含有概率为0的项
+			for (int j = 0; j < this.featureNum; j++) {
+				if (tempEntity.feature[j] > 0) {
+					for (int k = 0; k < 2; k++) {
+						if (this.featureCount[k][j] == 0) {
+							hasZero[k] = true;
+						}
+					}
+				}	
+			}
+			if (hasZero[0] && !hasZero[1]) {
+				myLabel = 1;
+			} else if (!hasZero[0] && hasZero[1]) {
+				
+			} else {
+				for (int j = 0; j < this.featureNum; j++) {
+					if (tempEntity.feature[j] > 0) {
+						for (int k = 0; k < 2; k++) {
+							double prob = 1.0*(this.featureCount[k][j]+this.alpha)
+									/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+							postProb[k] += Math.log(prob); //计算对数化后的概率
+						}
+					}
+				}
+				if (this.useMailInfo) {
+					for (int j = 0; j < this.mailNum; j++) {
+						if (tempEntity.mail[j] > 0) {
+							for (int k = 0; k < 2; k++) {
+								double prob = (this.mailCount[k][j]+this.alpha)
+										/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+								postProb[k] += this.alphaMail*Math.log(prob); //计算对数化后的概率
+							}
+						}
+					}
+				}
+				if (this.useTimeInfo) {
+					for (int j = 0; j < this.timeNum; j++) {
+						if (tempEntity.time[j] > 0) {
+							for (int k = 0; k < 2; k++) {
+								double prob = (this.timeCount[k][j]+this.alpha)
+										/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+								postProb[k] += this.alphaTime*Math.log(prob); //计算对数化后的概率
+							}
+						}
+					}
+				}
+				if (this.useXMailerInfo) {
+					for (int j = 0; j < this.xMailerNum; j++) {
+						if (tempEntity.xMailer[j] > 0) {
+							for (int k = 0; k < 2; k++) {
+								double prob = (this.xMailerCount[k][j]+this.alpha)
+										/(this.classCount[k]+NaiveBayes.trainSize*this.alpha); //平滑后的概率
+								postProb[k] += this.alphaXMailer*Math.log(prob); //计算对数化后的概率
+							}
+						}
+					}
+				}
+				if (postProb[1] > postProb[0]) {
+					myLabel = 1;
+				}
+			}
+			evaluateTable[tempEntity.label][myLabel]++; //向表中计数
+			if (this.alpha < 1e-14) {
+				//System.out.println(postProb[0] + " " + postProb[1]);
+				int index1 = -1;
+				if (postProb[0] == Double.NEGATIVE_INFINITY && postProb[1] == Double.NEGATIVE_INFINITY) {
+					index1 = 2;
+				} else if (postProb[0] == Double.NEGATIVE_INFINITY) {
+					index1 = 0;
+				} else if (postProb[1] == Double.NEGATIVE_INFINITY) {
+					index1 = 1;
+				}
+				if (index1 >= 0) {
+					infiniteCount[index1][0]++;
+					if (tempEntity.label == myLabel) {
+						infiniteCount[index1][1]++;
+					}
+				}
+			}
+			//System.out.println(postProb[0]+" "+postProb[1]);
+			if (tempEntity.label == myLabel) {
+				countRight++;
+			}
+		}
+		if (this.alpha < 1e-14) {
+			System.out.println("only P(.|ham)=0, Num: "+infiniteCount[0][0]
+					+" , accuracy = "+(1.0*infiniteCount[0][1]/infiniteCount[0][0]));
+			System.out.println("only P(.|spam)=0, Num: "+infiniteCount[1][0]
+					+" , accuracy = "+(1.0*infiniteCount[1][1]/infiniteCount[1][0]));
+			System.out.println("both P(.|ham/spam)=0, Num: "+infiniteCount[2][0]
+					+" , accuracy = "+(1.0*infiniteCount[2][1]/infiniteCount[2][0]));
+		}
+		return evaluateTable;
+	}
+	
 	public static void main(String[] args) {
 		NaiveBayes bayes = new NaiveBayes();
 		bayes.trainModel();
@@ -478,7 +600,7 @@ public class NaiveBayes {
 		//int high = bayes.trainSize;
 		int low = bayes.testStart;
 		int high = bayes.docSize;
-		int[][] table = bayes.testModel1(low, high); //采用模型1进行预测
+		int[][] table = bayes.testModel1_1(low, high); //采用模型1进行预测
 		double accuracy = 1.0 * (table[0][0]+table[1][1]) / (table[0][0]+table[0][1]+table[1][0]+table[1][1]);
 		double precision = 1.0 * table[1][1] / (table[0][1]+table[1][1]);
 		double recall = 1.0 * table[1][1] / (table[1][0]+table[1][1]);
