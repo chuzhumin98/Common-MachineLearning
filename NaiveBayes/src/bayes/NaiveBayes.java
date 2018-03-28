@@ -14,9 +14,9 @@ public class NaiveBayes {
 	public static final String matrixPath = "output/featurematrix.txt";
 	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
-	public static final int trainSize = 9000; //训练集数据的大小
+	public static final int trainSize = 4500; //训练集数据的大小
 	public static final int testStart = 45001; //测试集数据开始位置
-	public double alpha = 1.0 / Math.sqrt(trainSize); //设置平滑系数
+	public double alpha = 0; //设置平滑系数
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
 	
 	public int featureNum; //特征的维度
