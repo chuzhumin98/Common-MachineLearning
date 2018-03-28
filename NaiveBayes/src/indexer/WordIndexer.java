@@ -258,9 +258,9 @@ public class WordIndexer {
 		index1.readIndex();
 		index1.setWordList();
 		if (index1.isFiltered) {
-			//Filter.main(null);
+			Filter.main(null);
 		}
-		//index1.reorderTopword(500);
+		index1.reorderTopword(500);
 	}
 	
 

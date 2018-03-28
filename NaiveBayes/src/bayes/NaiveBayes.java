@@ -14,7 +14,7 @@ public class NaiveBayes {
 	public static final String matrixPath = "output/featurematrix.txt";
 	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
-	public static final int trainSize = 45000; //训练集数据的大小
+	public static final int trainSize = 9000; //训练集数据的大小
 	public static final int testStart = 45001; //测试集数据开始位置
 	public double alpha = 1.0 / Math.sqrt(trainSize); //设置平滑系数
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
@@ -452,7 +452,7 @@ public class NaiveBayes {
 		//int high = bayes.trainSize;
 		int low = bayes.testStart;
 		int high = bayes.docSize;
-		int[][] table = bayes.testModel3(low, high); //采用模型1进行预测
+		int[][] table = bayes.testModel1(low, high); //采用模型1进行预测
 		double accuracy = 1.0 * (table[0][0]+table[1][1]) / (table[0][0]+table[0][1]+table[1][0]+table[1][1]);
 		double precision = 1.0 * table[1][1] / (table[0][1]+table[1][1]);
 		double recall = 1.0 * table[1][1] / (table[1][0]+table[1][1]);
