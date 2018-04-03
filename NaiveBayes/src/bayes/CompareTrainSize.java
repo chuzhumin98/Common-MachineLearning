@@ -53,7 +53,7 @@ public class CompareTrainSize {
 	
 	public static void main(String[] args) {
 		CompareTrainSize compare = new CompareTrainSize();
-		int times = 1000;
+		int times = 10;
 		int size5 = compare.bayes.docSize / 20;
 		System.out.println("对5%训练集：");
 		double[] result5 = compare.computeError(size5, times);
