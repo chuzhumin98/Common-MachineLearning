@@ -14,8 +14,8 @@ public class NaiveBayes {
 	public static final String matrixPath = "output/featurematrix.txt";
 	//public static final String matrixPath = "output/featurematrix_nonfilter.txt";
 	public int docSize = 64620; //总的文档个数
-	public static final int trainSize = 45000; //训练集数据的大小
-	public static final int testStart = 45001; //测试集数据开始位置
+	public static int trainSize = 45000; //训练集数据的大小
+	public static int testStart = 45000; //测试集数据开始位置
 	public double alpha = 1/Math.sqrt(trainSize); //设置平滑系数
 	public ArrayList<Entity> entities = new ArrayList<Entity>(); //存储实体集
 	
@@ -32,13 +32,23 @@ public class NaiveBayes {
 	public int[][] xMailerCount;
 	public int[] classCount; //记录各类训练集总个数，其中0为ham,1为spam
 	
-	public boolean useMailInfo = true; ////是否使用邮箱信息
+	public boolean useMailInfo = false; ////是否使用邮箱信息
 	public boolean useTimeInfo = false;
-	public boolean useXMailerInfo = true;
+	public boolean useXMailerInfo = false;
 	
 	public double alphaMail = 6; //邮箱提供信息的权重
 	public double alphaTime = 1;
 	public double alphaXMailer = 8;
+	
+	/**
+	 * 设置训练集大小
+	 * 
+	 * @param size
+	 */
+	public static void setTrainSize(int size) {
+		NaiveBayes.trainSize = size;
+		NaiveBayes.testStart = size;
+	}
 	
 	public NaiveBayes() {
 		this.LoadMatrix();
@@ -190,8 +200,8 @@ public class NaiveBayes {
 			}
 		}
 		//训练结果输出展示
-		System.out.println("train spam doc size:"+this.classCount[1]);
-		System.out.println("train ham doc size:"+this.classCount[0]);
+		//System.out.println("train spam doc size:"+this.classCount[1]);
+		//System.out.println("train ham doc size:"+this.classCount[0]);
 		/*System.out.println("for spam type:");
 		for (int i = 0; i < this.featureNum; i++) {
 			System.out.print(this.featureCount[1][i]+" ");
