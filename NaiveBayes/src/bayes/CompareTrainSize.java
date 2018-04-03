@@ -1,5 +1,9 @@
 package bayes;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
 public class CompareTrainSize {
 	public NaiveBayes bayes; //载入Naive Bayes模型
 	
@@ -29,14 +33,33 @@ public class CompareTrainSize {
 		return error5;
 	}
 	
+	/**
+	 * 将错误率输出到文件中
+	 * 
+	 * @param a
+	 * @param b
+	 */
+	public void outputError(double[] a, double[] b, String path) {
+		try {
+			PrintStream output = new PrintStream(new File(path));
+			for (int i = 0; i < Math.min(a.length, b.length); i++) {
+				output.println(a[i]+" "+b[i]);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 		CompareTrainSize compare = new CompareTrainSize();
-		int times = 50;
+		int times = 1000;
 		int size5 = compare.bayes.docSize / 20;
 		System.out.println("对5%训练集：");
 		double[] result5 = compare.computeError(size5, times);
 		int size50 = compare.bayes.docSize / 2;
-		System.out.println("对5%训练集：");
+		System.out.println("对50%训练集：");
 		double[] result50 = compare.computeError(size50, times);
+		compare.outputError(result5, result50, "output/compare.txt");
 	}
 }
