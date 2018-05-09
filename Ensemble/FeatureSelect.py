@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn import tree
 
 # 记录所有的词项
 #    dataframe:输入的csv数据
@@ -63,9 +64,31 @@ def selectTopWords(dataframe, k):
     f.close()
     return usefulWords
 
+# 导入有用的词汇
+def loadUsefulWords(path):
+    f = open(path, "rb")
+    usefulWords = np.load(f)
+    f.close()
+    return usefulWords
+
+# 计算词项矩阵
+def calculateAppearMatrix(usefulWords, dataframe):
+    size = len(dataframe)
+    k = len(usefulWords)
+    AppearMatrix = np.zeros([size, k])
+
+
+
 if __name__ == '__main__':
     trainFilePath = 'exp2.train.csv'
     df1 = pd.read_csv(trainFilePath, encoding='utf-8')
     #recordTotalWords(df1)
-    usefulWords = selectTopWords(df1, 1000)
+    #usefulWords = selectTopWords(df1, 1000)
+    usefulWords = loadUsefulWords('usefulWords200.npy')
     print(usefulWords)
+    X = [[0, 0], [1, 1],[2, 2]]
+    Y = [0, 1, 2]
+    clf = tree.DecisionTreeClassifier()
+    clf = clf.fit(X, Y)
+    print(clf.predict([[2., 0.5]]))
+    print(clf.predict_proba([[2., 0.5]]))  # 计算属于每个类的概率
