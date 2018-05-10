@@ -64,6 +64,7 @@ def selectTopWords(dataframe, k):
     f.close()
     return usefulWords
 
+
 # 导入有用的词汇
 def loadUsefulWords(path):
     f = open(path, "rb")
@@ -71,12 +72,16 @@ def loadUsefulWords(path):
     f.close()
     return usefulWords
 
+
 # 计算词项矩阵
 def calculateAppearMatrix(usefulWords, dataframe):
     size = len(dataframe)
     k = len(usefulWords)
     AppearMatrix = np.zeros([size, k])
-
+    print(usefulWords)
+    for i in range(len(usefulWords)):
+        wordInIndex = dataframe['review'].str.contains(usefulWords[i])
+        print(wordInIndex)
 
 
 if __name__ == '__main__':
@@ -85,10 +90,4 @@ if __name__ == '__main__':
     #recordTotalWords(df1)
     #usefulWords = selectTopWords(df1, 1000)
     usefulWords = loadUsefulWords('usefulWords200.npy')
-    print(usefulWords)
-    X = [[0, 0], [1, 1],[2, 2]]
-    Y = [0, 1, 2]
-    clf = tree.DecisionTreeClassifier()
-    clf = clf.fit(X, Y)
-    print(clf.predict([[2., 0.5]]))
-    print(clf.predict_proba([[2., 0.5]]))  # 计算属于每个类的概率
+    calculateAppearMatrix(usefulWords, df1)
