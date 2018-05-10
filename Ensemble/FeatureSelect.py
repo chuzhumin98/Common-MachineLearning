@@ -66,11 +66,11 @@ def selectTopWords(dataframe, k):
 
 
 # 导入有用的词汇
-def loadUsefulWords(path):
+def loadData(path):
     f = open(path, "rb")
-    usefulWords = np.load(f)
+    data = np.load(f)
     f.close()
-    return usefulWords
+    return data
 
 
 # 计算词项矩阵
@@ -78,16 +78,19 @@ def calculateAppearMatrix(usefulWords, dataframe):
     size = len(dataframe)
     k = len(usefulWords)
     AppearMatrix = np.zeros([size, k])
-    print(usefulWords)
     for i in range(len(usefulWords)):
         wordInIndex = dataframe['review'].str.contains(usefulWords[i])
-        print(wordInIndex)
-
+        AppearMatrix[wordInIndex,i] = 1
+    print(AppearMatrix)
+    # 将数据导出到文件中
+    f = open("matrix1000.npy", "wb")
+    np.save(f, AppearMatrix)
+    f.close()
 
 if __name__ == '__main__':
     trainFilePath = 'exp2.train.csv'
     df1 = pd.read_csv(trainFilePath, encoding='utf-8')
     #recordTotalWords(df1)
     #usefulWords = selectTopWords(df1, 1000)
-    usefulWords = loadUsefulWords('usefulWords200.npy')
-    calculateAppearMatrix(usefulWords, df1)
+    #usefulWords = loadData('usefulWords1000.npy')
+    #calculateAppearMatrix(usefulWords, df1)
