@@ -38,25 +38,33 @@ def splitDatas(samples, samplesLabels):
     validateLabel = samplesLabels[indexArray[validateStart:size]]
     return [trainData, trainLabel, validateData, validateLabel]
 
+# 实现bagging算法
+#    times：bootstrap的次数
+def baggingDT(trainMatrix, trainLabels, testMatrix, times):
+    predictResultSamples = np.zeros([times, len(testMatrix)])
+    for i in range(times):
+        bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
+        print(bootstrapIndexs)
+        clf = tree.DecisionTreeClassifier()
+        clf = clf.fit(trainMatrix, trainLabels)
+        predictResultSamples[i,:] = clf.predict(testMatrix)
+    predictResult = np.mean(predictResultSamples, axis=0)
+    return predictResult
 
 if __name__ == '__main__':
     # 导入数据部分
     trainFilePath = 'exp2.train.csv'
     df1 = pd.read_csv(trainFilePath, encoding='utf-8')
-    trainLabels = np.array(df1['label'])
-    trainAppearMatrix = loadData('matrix1000.npy')
-    trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix, trainLabels)
+    trainLabels0 = np.array(df1['label'])
+    trainAppearMatrix0 = loadData('matrix1000.npy')
     testAppearMatrix = loadData('testMatrix1000.npy')
     print('succeed load data')
     # 进行模型训练训练和预测部分
-    clf = tree.DecisionTreeClassifier()
-    clf = clf.fit(trainAppearMatrix, trainLabels)
-    predictResult = clf.predict(validateAppearMatrix)
-    print(predictResult)
-    print(validateLabels)
-    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
+    #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 10)
+    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    predictResult = clf.predict(testAppearMatrix)
-    exportResult(predictResult, 'result/decision_tree_baseline1000_0_8.csv')
+    predictResult = baggingDT(trainAppearMatrix, trainLabels, testAppearMatrix, 10)
+    exportResult(predictResult, 'result/decision_tree_20bagging1000_0_8.csv')
 
 
