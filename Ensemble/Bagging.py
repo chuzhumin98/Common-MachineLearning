@@ -1,4 +1,5 @@
 from sklearn import tree
+from sklearn import svm
 from FeatureSelect import loadData
 import pandas as pd
 import numpy as np
@@ -38,16 +39,29 @@ def splitDatas(samples, samplesLabels):
     validateLabel = samplesLabels[indexArray[validateStart:size]]
     return [trainData, trainLabel, validateData, validateLabel]
 
-# 实现bagging算法
+# 实现决策树的bagging算法
 #    times：bootstrap的次数
 def baggingDT(trainMatrix, trainLabels, testMatrix, times):
     predictResultSamples = np.zeros([times, len(testMatrix)])
     for i in range(times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
-        print(bootstrapIndexs)
+        print(i,':',bootstrapIndexs)
         clf = tree.DecisionTreeClassifier()
         clf = clf.fit(trainMatrix, trainLabels)
         predictResultSamples[i,:] = clf.predict(testMatrix)
+    predictResult = np.mean(predictResultSamples, axis=0)
+    return predictResult
+
+# 实现svm的bagging算法
+def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
+    predictResultSamples = np.zeros([times, len(testMatrix)])
+    for i in range(times):
+        bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
+        print(i,':',bootstrapIndexs)
+        #clf = svm.SVR()
+        clf = svm.LinearSVR()
+        clf.fit(trainMatrix, trainLabels)
+        predictResultSamples[i, :] = clf.predict(testMatrix)
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
 
@@ -61,10 +75,10 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 10)
+    #predictResult = baggingSVM(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    predictResult = baggingDT(trainAppearMatrix, trainLabels, testAppearMatrix, 10)
-    exportResult(predictResult, 'result/decision_tree_20bagging1000_0_8.csv')
+    predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
+    exportResult(predictResult, 'result/SVR_20bagging1000.csv')
 
 

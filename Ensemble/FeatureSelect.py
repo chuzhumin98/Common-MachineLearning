@@ -58,7 +58,7 @@ def selectTopWords(dataframe, k):
     topkIndex = np.argpartition(-infoGains, k-1)[0:k] #找到topk信息量的词汇
     usefulWords = totalWords[topkIndex]
     # 将数据导出到文件中
-    f = open("usefulWords1000.npy", "wb")
+    f = open("usefulWords500.npy", "wb")
     np.save(f, usefulWords)
     f.close()
     return usefulWords
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     testFilePath = 'exp2.validation_review.csv'
     df1 = pd.read_csv(trainFilePath, encoding='utf-8')
     #recordTotalWords(df1)
-    #usefulWords = selectTopWords(df1, 1000)
-    usefulWords = loadData('usefulWords200.npy')
-    #calculateAppearMatrix(usefulWords, df1, 'matrix1000.npy')
+    usefulWords = selectTopWords(df1, 500)
+    #usefulWords = loadData('usefulWords200.npy')
+    calculateAppearMatrix(usefulWords, df1, 'matrix500.npy')
     df2 = pd.read_csv(testFilePath, encoding='utf-8')
-    calculateAppearMatrix(usefulWords, df2, 'testMatrix200.npy')
+    calculateAppearMatrix(usefulWords, df2, 'testMatrix500.npy')
