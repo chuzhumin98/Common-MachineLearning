@@ -109,7 +109,7 @@ if __name__ == '__main__':
     #predictResult = baggingSVM(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
-    exportResult(predictResult, 'result/decision_tree_20bagging1000_v2.csv')
+    predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
+    exportResult(predictResult, 'result/SVM_20bagging1000_v2.csv')
 
 
