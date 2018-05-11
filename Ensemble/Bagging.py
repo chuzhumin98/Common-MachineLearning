@@ -47,7 +47,9 @@ def baggingDT(trainMatrix, trainLabels, testMatrix, times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
         print(i,':',bootstrapIndexs)
         clf = tree.DecisionTreeClassifier()
-        clf = clf.fit(trainMatrix, trainLabels)
+        bootstrapTrainMatrix = trainMatrix[bootstrapIndexs]
+        bootstrapTrainLabels = trainLabels[bootstrapIndexs]
+        clf = clf.fit(bootstrapTrainMatrix, bootstrapTrainLabels)
         predictResultSamples[i,:] = clf.predict(testMatrix)
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
@@ -58,9 +60,10 @@ def baggingSVR(trainMatrix, trainLabels, testMatrix, times):
     for i in range(times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
         print(i,':',bootstrapIndexs)
-        #clf = svm.SVR()
+        bootstrapTrainMatrix = trainMatrix[bootstrapIndexs]
+        bootstrapTrainLabels = trainLabels[bootstrapIndexs]
         clf = svm.LinearSVR()
-        clf.fit(trainMatrix, trainLabels)
+        clf.fit(bootstrapTrainMatrix, bootstrapTrainLabels)
         predictResultSamples[i, :] = clf.predict(testMatrix)
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
@@ -80,11 +83,13 @@ def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
     for i in range(times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
         print(i,':',bootstrapIndexs)
-        #clf = svm.SVR()
+        bootstrapTrainMatrix = trainMatrix[bootstrapIndexs]
+        bootstrapTrainLabels1 = trainLabels1[bootstrapIndexs]
+        bootstrapTrainLabels2 = trainLabels2[bootstrapIndexs]
         clf = svm.LinearSVC()
-        clf.fit(trainMatrix, trainLabels1)
+        clf.fit(bootstrapTrainMatrix, bootstrapTrainLabels1)
         predict1 = clf.predict(testMatrix) #采用-1和0.5进行分类
-        clf.fit(trainMatrix, trainLabels2)
+        clf.fit(bootstrapTrainMatrix, bootstrapTrainLabels2)
         predict2 = clf.predict(testMatrix) #采用1和-0.5进行分类
         predictResultSamples[i, :] = (predict1+predict2)/3
     predictResult = np.mean(predictResultSamples, axis=0)
@@ -104,7 +109,7 @@ if __name__ == '__main__':
     #predictResult = baggingSVM(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
-    exportResult(predictResult, 'result/SVM_20bagging1000.csv')
+    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
+    exportResult(predictResult, 'result/decision_tree_20bagging1000_v2.csv')
 
 
