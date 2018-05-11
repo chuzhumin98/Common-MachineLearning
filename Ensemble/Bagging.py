@@ -52,8 +52,8 @@ def baggingDT(trainMatrix, trainLabels, testMatrix, times):
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
 
-# 实现svm的bagging算法
-def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
+# 实现svr的bagging算法
+def baggingSVR(trainMatrix, trainLabels, testMatrix, times):
     predictResultSamples = np.zeros([times, len(testMatrix)])
     for i in range(times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
@@ -64,6 +64,32 @@ def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
         predictResultSamples[i, :] = clf.predict(testMatrix)
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
+
+
+# 实现svm的bagging算法
+def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
+    predictResultSamples = np.zeros([times, len(testMatrix)])
+    trainLabels1 = np.copy(trainLabels) #将0和1划分成一类
+    trainLabels1[trainLabels1[:] >= 0] = 1
+    trainLabels1[trainLabels1[:] == -1] = -2
+    print(trainLabels1)
+    trainLabels2 = np.copy(trainLabels) #将0和-1划分为一类
+    trainLabels2[trainLabels2[:] <= 0] = -1
+    trainLabels2[trainLabels2[:] == 1] = 2
+    print(trainLabels2)
+    for i in range(times):
+        bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
+        print(i,':',bootstrapIndexs)
+        #clf = svm.SVR()
+        clf = svm.LinearSVC()
+        clf.fit(trainMatrix, trainLabels1)
+        predict1 = clf.predict(testMatrix) #采用-1和0.5进行分类
+        clf.fit(trainMatrix, trainLabels2)
+        predict2 = clf.predict(testMatrix) #采用1和-0.5进行分类
+        predictResultSamples[i, :] = (predict1+predict2)/3
+    predictResult = np.mean(predictResultSamples, axis=0)
+    return predictResult
+
 
 if __name__ == '__main__':
     # 导入数据部分
@@ -79,6 +105,6 @@ if __name__ == '__main__':
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
     predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
-    exportResult(predictResult, 'result/SVR_20bagging1000.csv')
+    exportResult(predictResult, 'result/SVM_20bagging1000.csv')
 
 
