@@ -119,7 +119,7 @@ if __name__ == '__main__':
     #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=26)
-    exportResult(predictResult, 'result/decision_tree_20bagging1000_prun_v4.csv')
+    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=None)
+    exportResult(predictResult, 'result/decision_tree_20bagging1000_v5.csv')
 
 
