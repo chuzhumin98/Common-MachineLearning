@@ -17,11 +17,13 @@ def exportResult(predictResult, path):
 
 # 对结果按照所给的公式进行评价
 def evaluateResult(label, predictLabel):
-    if (len(label) != len(predictResult)):
+    if (len(label) != len(predictLabel)):
         print('error for label and predictLabel is not equavalant length')
+        print('type:',type(label),' vs ',type(predictLabel))
+        print('label len:', len(label), ', predicted label len:', len(predictLabel))
         return 2
     else:
-        RMSE = math.sqrt(np.mean(np.square(np.subtract(label,predictResult))))
+        RMSE = math.sqrt(np.mean(np.square(np.subtract(label,predictLabel))))
         return RMSE
 
 #随机划分训练集和验证集
@@ -46,7 +48,7 @@ def baggingDT(trainMatrix, trainLabels, testMatrix, times):
     for i in range(times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
         print(i,':',bootstrapIndexs)
-        clf = tree.DecisionTreeClassifier()
+        clf = tree.DecisionTreeClassifier(max_depth=1)
         bootstrapTrainMatrix = trainMatrix[bootstrapIndexs]
         bootstrapTrainLabels = trainLabels[bootstrapIndexs]
         clf = clf.fit(bootstrapTrainMatrix, bootstrapTrainLabels)
@@ -106,10 +108,12 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    #predictResult = baggingSVM(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
-    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
+    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    predictResult1 = baggingDT(trainAppearMatrix, trainLabels, trainAppearMatrix, 1)
+    print('RMSE in trainSet:', evaluateResult(trainLabels, predictResult1))
     # 结果导出部分
-    predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
-    exportResult(predictResult, 'result/SVM_20bagging1000_v2.csv')
+    #predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
+    #exportResult(predictResult, 'result/SVM_20bagging1000_v2.csv')
 
 
