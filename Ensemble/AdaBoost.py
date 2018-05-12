@@ -6,20 +6,22 @@ import pandas as pd
 import numpy as np
 from sklearn import tree
 from sklearn import svm
+import math
 
 # AdaBoost.M1的实现框架
 #    T:AdaBoost中的尝试长度
 #    method:0为决策树，1为SVM
-def AdaBoost(trainMatrix, trainLabels, testMatrix, T, method):
+#    maxDepth:仅在决策树剪枝时使用
+def AdaBoost(trainMatrix, trainLabels, testMatrix, T, method, maxDepth=17):
     weight = np.ones(len(trainLabels))/len(trainLabels) #各样本点的权重，初始时权重相同
-    modelWeight = np.zeros([T]) #所得到的各个模型的权重
+    modelWeight = np.zeros([T,1]) #所得到的各个模型的权重
     models = np.zeros([T, len(testMatrix)]) #各个model对测试集数据的分类结果
     for i in range(T):
         if (method == 0):
             AdaBoostIndex = np.random.choice(len(trainLabels), len(trainLabels), p=weight) #按指定概率抽取样本
             AdaBoostTrainMatrix = trainMatrix[AdaBoostIndex, :] #重采样得到的训练样本
             AdaBoostTrainLabels = trainLabels[AdaBoostIndex] #重采样得到的训练标签
-            clf = tree.DecisionTreeClassifier(max_depth=15)
+            clf = tree.DecisionTreeClassifier(max_depth=maxDepth)
             clf.fit(AdaBoostTrainMatrix, AdaBoostTrainLabels)
             models[i,:] = clf.predict(testMatrix) #记录下来当前这个模型的预测结果
             predictTrainLabels = clf.predict(AdaBoostTrainMatrix) #在训练集上的效果
@@ -27,15 +29,20 @@ def AdaBoost(trainMatrix, trainLabels, testMatrix, T, method):
             misclassifyIndex = deltaPredict[:] != 0
             epsilon = np.sum(weight[misclassifyIndex])
             print(i,':',epsilon)
-            if (epsilon >= 0.6666):
+            if (epsilon >= 0.5):
                 continue #当错误率太大时，则丢弃模型，不更新模型权值
             classifyIndex = deltaPredict[:] == 0
             beta = epsilon / (1-epsilon)
             weight[classifyIndex] = weight[classifyIndex] * beta #修改权重信息
-
-
-
-
+            totalWeight = np.sum(weight) #对权重重新进行归一化
+            weight = weight/totalWeight
+            modelWeight[i,0] = math.log(1/beta) #记录该模型分配的权重
+    totalModelWeight = np.sum(modelWeight[:,0])
+    modelWeight = modelWeight / totalModelWeight #对模型权重进行归一化
+    print(modelWeight)
+    predictResult = np.sum(np.multiply(models, np.tile(modelWeight, [1,len(testMatrix)])),axis=0)
+    print(predictResult)
+    return predictResult
 
 
 if __name__ == '__main__':
@@ -48,4 +55,6 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    AdaBoost(trainAppearMatrix, trainLabels, validateAppearMatrix, 5, 0) #使用AdaBoost进行分类
+    predictResult = AdaBoost(trainAppearMatrix, trainLabels, validateAppearMatrix, 10, 0) #使用AdaBoost进行分类
+    # 将预测结果输出
+    exportResult(predictResult, 'result/decision_tree_10AdaBoost1000_prun17_v1_.csv')

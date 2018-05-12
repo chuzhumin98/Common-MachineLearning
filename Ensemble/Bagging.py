@@ -43,12 +43,12 @@ def splitDatas(samples, samplesLabels):
 
 # 实现决策树的bagging算法
 #    times：bootstrap的次数
-def baggingDT(trainMatrix, trainLabels, testMatrix, times):
+def baggingDT(trainMatrix, trainLabels, testMatrix, times, maxDepth = 26):
     predictResultSamples = np.zeros([times, len(testMatrix)])
     for i in range(times):
         bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
         print(i,':',bootstrapIndexs)
-        clf = tree.DecisionTreeClassifier(max_depth=1)
+        clf = tree.DecisionTreeClassifier(max_depth=maxDepth)
         bootstrapTrainMatrix = trainMatrix[bootstrapIndexs]
         bootstrapTrainLabels = trainLabels[bootstrapIndexs]
         clf = clf.fit(bootstrapTrainMatrix, bootstrapTrainLabels)
@@ -108,12 +108,18 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
-    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
-    predictResult1 = baggingDT(trainAppearMatrix, trainLabels, trainAppearMatrix, 1)
-    print('RMSE in trainSet:', evaluateResult(trainLabels, predictResult1))
+    #这个for循环用于剪枝深度的选取
+    """
+    for i in range(30,45):
+        predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1, i)
+        print('RMSE in validateSet with depth = ',i,':', evaluateResult(validateLabels, predictResult))
+        predictResult1 = baggingDT(trainAppearMatrix, trainLabels, trainAppearMatrix, 1, i)
+        print('RMSE in trainSet with depth = ',i,':', evaluateResult(trainLabels, predictResult1))
+    """
+    #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
+    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    #predictResult = baggingSVM(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20)
-    #exportResult(predictResult, 'result/SVM_20bagging1000_v2.csv')
+    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=26)
+    exportResult(predictResult, 'result/decision_tree_20bagging1000_prun_v4.csv')
 
 
