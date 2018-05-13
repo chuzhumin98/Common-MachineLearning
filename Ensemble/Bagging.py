@@ -1,6 +1,8 @@
 from sklearn import tree
 from sklearn import svm
 from FeatureSelect import loadData
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import MultinomialNB
 import pandas as pd
 import numpy as np
 import math
@@ -97,6 +99,24 @@ def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
 
+# 采用random forest算法进行预测
+#    state:采用的森林的大小
+def RandomForest(trainMatrix, trainLabels, testMatrix, state = 10):
+    clf = RandomForestClassifier(oob_score=True, random_state=state)
+    clf.fit(trainMatrix, trainLabels)
+    return clf.predict(testMatrix)
+
+# 采用带深度限制剪枝的决策树进行预测
+def DecisionTree(trainMatrix, trainLabels, testMatrix, maxDepth=26):
+    clf = tree.DecisionTreeClassifier(max_depth=maxDepth)
+    clf.fit(trainMatrix, trainLabels)
+    return clf.predict(testMatrix)
+
+#朴素贝叶斯分类器
+def NaiveBayes(trainMatrix, trainLabels, testMatrix, alpha=0.01):
+    clf = MultinomialNB(alpha=alpha)
+    clf.fit(trainMatrix, trainLabels)
+    return clf.predict(testMatrix)
 
 if __name__ == '__main__':
     # 导入数据部分
@@ -119,7 +139,10 @@ if __name__ == '__main__':
     #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 结果导出部分
-    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=None)
-    exportResult(predictResult, 'result/decision_tree_20bagging1000_v5.csv')
+    #predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=None)
+    #predictResult = RandomForest(trainAppearMatrix0, trainLabels0, testAppearMatrix, 50)
+    #predictResult = DecisionTree(trainAppearMatrix0, trainLabels0, testAppearMatrix, maxDepth=26)
+    predictResult = NaiveBayes(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    exportResult(predictResult, 'result/Naive_Bayes_0.01_v1.csv')
 
 

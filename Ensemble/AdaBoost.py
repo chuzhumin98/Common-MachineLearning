@@ -61,6 +61,6 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    predictResult = AdaBoost(trainAppearMatrix0, trainLabels0, testAppearMatrix, 10, 1, maxDepth=None) #使用AdaBoost进行分类
+    predictResult = AdaBoost(trainAppearMatrix0, trainLabels0, testAppearMatrix, 5, 0, maxDepth=50) #使用AdaBoost进行分类
     # 将预测结果输出
-    exportResult(predictResult, 'result/svm_10AdaBoost1000_v1.csv')
+    exportResult(predictResult, 'result/decision_tree_5AdaBoost1000_v1.csv')
