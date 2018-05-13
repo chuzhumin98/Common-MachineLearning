@@ -3,6 +3,8 @@ from sklearn import svm
 from FeatureSelect import loadData
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
 import pandas as pd
 import numpy as np
 import math
@@ -118,6 +120,18 @@ def NaiveBayes(trainMatrix, trainLabels, testMatrix, alpha=0.01):
     clf.fit(trainMatrix, trainLabels)
     return clf.predict(testMatrix)
 
+#采用KNN方法进行预测
+def KNN(trainMatrix, trainLabels, testMatrix):
+    clf = KNeighborsClassifier()
+    clf.fit(trainMatrix, trainLabels)
+    return clf.predict(testMatrix)
+
+#采用logistic回归进行预测
+def Logistic(trainMatrix, trainLabels, testMatrix):
+    clf = LogisticRegression(penalty='l2')
+    clf.fit(trainMatrix, trainLabels)
+    return clf.predict(testMatrix)
+
 if __name__ == '__main__':
     # 导入数据部分
     trainFilePath = 'exp2.train.csv'
@@ -138,11 +152,15 @@ if __name__ == '__main__':
     """
     #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
     #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
-    # 结果导出部分
-    #predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=None)
+    #采用单一方法进行测试部分
     #predictResult = RandomForest(trainAppearMatrix0, trainLabels0, testAppearMatrix, 50)
     #predictResult = DecisionTree(trainAppearMatrix0, trainLabels0, testAppearMatrix, maxDepth=26)
-    predictResult = NaiveBayes(trainAppearMatrix0, trainLabels0, testAppearMatrix)
-    exportResult(predictResult, 'result/Naive_Bayes_0.01_v1.csv')
+    #predictResult = NaiveBayes(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    #predictResult = KNN(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    predictResult = Logistic(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    exportResult(predictResult, 'result/Logistic_regression_v1.csv')
+    # 结果导出部分
+    # predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=None)
+    #exportResult(predictResult, 'result/KNN_v1.csv')
 
 
