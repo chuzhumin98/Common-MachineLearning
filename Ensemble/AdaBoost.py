@@ -24,13 +24,13 @@ def AdaBoost(trainMatrix, trainLabels, testMatrix, T, method, maxDepth=17):
             clf = tree.DecisionTreeClassifier(max_depth=maxDepth)
             clf.fit(AdaBoostTrainMatrix, AdaBoostTrainLabels)
             models[i,:] = clf.predict(testMatrix) #记录下来当前这个模型的预测结果
-            predictTrainLabels = clf.predict(AdaBoostTrainMatrix) #在训练集上的效果
+            predictTrainLabels = clf.predict(trainMatrix) #在训练集上的效果
         else:
             clf = svm.LinearSVC()
             clf.fit(AdaBoostTrainMatrix, AdaBoostTrainLabels)
             models[i, :] = clf.predict(testMatrix)  # 记录下来当前这个模型的预测结果
-            predictTrainLabels = clf.predict(AdaBoostTrainMatrix)  # 在训练集上的效果
-        deltaPredict = AdaBoostTrainLabels - predictTrainLabels  # 将真实标签与测试标签进行作差
+            predictTrainLabels = clf.predict(trainMatrix)  # 在训练集上的效果
+        deltaPredict = trainLabels - predictTrainLabels  # 将真实标签与测试标签进行作差
         misclassifyIndex = deltaPredict[:] != 0
         epsilon = np.sum(weight[misclassifyIndex])
         print(i, ':', epsilon)
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    predictResult = AdaBoost(trainAppearMatrix0, trainLabels0, testAppearMatrix, 5, 0, maxDepth=50) #使用AdaBoost进行分类
+    predictResult = AdaBoost(trainAppearMatrix0, trainLabels0, testAppearMatrix, 10, 1, maxDepth=None) #使用AdaBoost进行分类
     # 将预测结果输出
-    exportResult(predictResult, 'result/decision_tree_5AdaBoost1000_v1.csv')
+    exportResult(predictResult, 'result/SVM_10AdaBoost1000_v2.csv')
