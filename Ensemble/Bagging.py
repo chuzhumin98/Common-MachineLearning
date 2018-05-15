@@ -163,8 +163,8 @@ if __name__ == '__main__':
         predictResult1 = baggingDT(trainAppearMatrix, trainLabels, trainAppearMatrix, 1, i)
         print('RMSE in trainSet with depth = ',i,':', evaluateResult(trainLabels, predictResult1))
     """
-    #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 1)
-    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    predictResult = baggingSVR(trainAppearMatrix, trainLabels, validateAppearMatrix, 20)
+    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
 
 
     # 采用单一方法进行测试部分
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     #predictResult = SVR(trainAppearMatrix0, trainLabels0, testAppearMatrix)
     #exportResult(predictResult, 'result/SVR_v1.csv')
     # 结果导出部分
-    # predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=None)
-    #exportResult(predictResult, 'result/KNN_v1.csv')
+    #predictResult = baggingSVR(trainAppearMatrix0, trainLabels0, testAppearMatrix, 10)
+    #exportResult(predictResult, 'result/SVR_bagging_10_v1.csv')
 
 

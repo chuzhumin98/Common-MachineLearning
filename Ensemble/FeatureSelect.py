@@ -25,6 +25,7 @@ def selectTopWords(dataframe, k):
     f = open("totalWords.npy", "rb")
     totalWords = np.load(f)
     f.close()
+    print(len(totalWords))
     labelCounts = np.zeros([3]) #记录各类别出现的总次数，分别为标签1,0，-1
     labelCounts[0] = len(dataframe.loc[(dataframe['label'] == 1)])
     labelCounts[1] = len(dataframe.loc[(dataframe['label'] == 0)])
@@ -90,9 +91,10 @@ if __name__ == '__main__':
     trainFilePath = 'exp2.train.csv'
     testFilePath = 'exp2.validation_review.csv'
     df1 = pd.read_csv(trainFilePath, encoding='utf-8')
-    #recordTotalWords(df1)
-    usefulWords = selectTopWords(df1, 500)
-    #usefulWords = loadData('usefulWords200.npy')
-    calculateAppearMatrix(usefulWords, df1, 'matrix500.npy')
-    df2 = pd.read_csv(testFilePath, encoding='utf-8')
-    calculateAppearMatrix(usefulWords, df2, 'testMatrix500.npy')
+    recordTotalWords(df1)
+    #usefulWords = selectTopWords(df1, 500)
+    usefulWords = loadData('usefulWords200.npy')
+    print(usefulWords)
+    #calculateAppearMatrix(usefulWords, df1, 'matrix500.npy')
+    #df2 = pd.read_csv(testFilePath, encoding='utf-8')
+    #calculateAppearMatrix(usefulWords, df2, 'testMatrix500.npy')
