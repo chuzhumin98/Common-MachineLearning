@@ -144,6 +144,25 @@ def SVR(trainMatrix, trainLabels, testMatrix):
     clf.fit(trainMatrix, trainLabels)
     return clf.predict(testMatrix)
 
+#根据不同的参数method来挑选采用的分类模型
+#    method取值：0-决策树，1-SVM，2-SVR，3-Naive Bayes，4-KNN，5-Logistic Regression，other-随机森林
+def chooseMethod(trainMatrix, trainLabels, testMatrix, method):
+    if (method == 0):
+        return DecisionTree(trainMatrix, trainLabels, testMatrix, maxDepth=None)
+    elif (method == 1):
+        return SVM(trainMatrix, trainLabels, testMatrix)
+    elif (method == 2):
+        return SVR(trainMatrix, trainLabels, testMatrix)
+    elif (method == 3):
+        return NaiveBayes(trainMatrix, trainLabels, testMatrix)
+    elif (method == 4):
+        return KNN(trainMatrix, trainLabels, testMatrix)
+    elif (method == 5):
+        return Logistic(trainMatrix, trainLabels, testMatrix)
+    else:
+        return RandomForest(trainMatrix, trainLabels, testMatrix)
+
+
 if __name__ == '__main__':
     # 导入数据部分
     trainFilePath = 'exp2.train.csv'
@@ -163,21 +182,22 @@ if __name__ == '__main__':
         predictResult1 = baggingDT(trainAppearMatrix, trainLabels, trainAppearMatrix, 1, i)
         print('RMSE in trainSet with depth = ',i,':', evaluateResult(trainLabels, predictResult1))
     """
-    predictResult = baggingSVR(trainAppearMatrix, trainLabels, validateAppearMatrix, 20)
-    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 20, maxDepth=26)
+    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
 
 
     # 采用单一方法进行测试部分
-    #predictResult = RandomForest(trainAppearMatrix0, trainLabels0, testAppearMatrix, 50)
+    #predictResult = RandomForest(trainAppearMatrix, trainLabels, validateAppearMatrix, 50)
     #predictResult = DecisionTree(trainAppearMatrix0, trainLabels0, testAppearMatrix, maxDepth=26)
-    #predictResult = NaiveBayes(trainAppearMatrix0, trainLabels0, testAppearMatrix)
-    #predictResult = KNN(trainAppearMatrix0, trainLabels0, testAppearMatrix)
-    #predictResult = Logistic(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    #predictResult = NaiveBayes(trainAppearMatrix, trainLabels, validateAppearMatrix)
+    #predictResult = KNN(trainAppearMatrix, trainLabels, validateAppearMatrix)
+    predictResult = Logistic(trainAppearMatrix, trainLabels, validateAppearMatrix)
     #predictResult = SVM(trainAppearMatrix0, trainLabels0, testAppearMatrix)
     #predictResult = SVR(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     #exportResult(predictResult, 'result/SVR_v1.csv')
     # 结果导出部分
-    #predictResult = baggingSVR(trainAppearMatrix0, trainLabels0, testAppearMatrix, 10)
-    #exportResult(predictResult, 'result/SVR_bagging_10_v1.csv')
+    #predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=50)
+    #exportResult(predictResult, 'result/decision_tree_bagging_20_prunning50_v1.csv')
 
 

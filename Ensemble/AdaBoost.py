@@ -61,8 +61,8 @@ if __name__ == '__main__':
     print('succeed load data')
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    predictResult = AdaBoost(trainAppearMatrix, trainLabels, validateAppearMatrix, 5, 1, maxDepth=None) #使用AdaBoost进行分类
+    predictResult = AdaBoost(trainAppearMatrix, trainLabels, validateAppearMatrix, 20, 0, maxDepth=None) #使用AdaBoost进行分类
     print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 将预测结果输出
-    #predictResult = AdaBoost(trainAppearMatrix0, trainLabels0, testAppearMatrix, 5, 0, maxDepth=None)  # 使用AdaBoost进行分类
-    #exportResult(predictResult, 'result/decision_tree_5AdaBoost1000_v2.csv')
+    #predictResult = AdaBoost(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, 0, maxDepth=None)  # 使用AdaBoost进行分类
+    #exportResult(predictResult, 'result/decision_tree_20AdaBoost1000_v2.csv')
