@@ -1,49 +1,7 @@
-from sklearn import tree
-from sklearn import svm
 from FeatureSelect import loadData
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.linear_model import LogisticRegression
-import pandas as pd
-import numpy as np
-import math
+from usefulMethod import *
+from commonFunction import *
 
-# 将测试结果写入csv文件
-def exportResult(predictResult, path):
-    resultArray = np.zeros([len(predictResult), 2])  # 结果矩阵
-    resultArray[:, 0] = range(1, len(predictResult) + 1)
-    resultArray[:, 1] = predictResult
-    resultdf = pd.DataFrame(resultArray, columns=['id', 'label'])
-    resultdf['id'] = resultdf['id'].astype('int')
-    resultdf.to_csv(path, index=False)
-
-
-# 对结果按照所给的公式进行评价
-def evaluateResult(label, predictLabel):
-    if (len(label) != len(predictLabel)):
-        print('error for label and predictLabel is not equavalant length')
-        print('type:',type(label),' vs ',type(predictLabel))
-        print('label len:', len(label), ', predicted label len:', len(predictLabel))
-        return 2
-    else:
-        RMSE = math.sqrt(np.mean(np.square(np.subtract(label,predictLabel))))
-        return RMSE
-
-#随机划分训练集和验证集
-#    参数samples：所有样本数据
-#    参数samplesLabels：样本所对应的标签
-#    return：[训练集数据, 训练集标签, 验证集数据, 验证集标签]
-def splitDatas(samples, samplesLabels):
-    size = len(samplesLabels) #总的样本点个数
-    indexArray = np.array(range(size), dtype=int) #下标数组
-    np.random.shuffle(indexArray)
-    validateStart = size * 4 // 5 #按照4:1的比例划分划分训练集和验证集
-    trainData = samples[indexArray[0:validateStart]]
-    trainLabel = samplesLabels[indexArray[0:validateStart]]
-    validateData = samples[indexArray[validateStart:size]]
-    validateLabel = samplesLabels[indexArray[validateStart:size]]
-    return [trainData, trainLabel, validateData, validateLabel]
 
 # 实现决策树的bagging算法
 #    times：bootstrap的次数
@@ -101,66 +59,19 @@ def baggingSVM(trainMatrix, trainLabels, testMatrix, times):
     predictResult = np.mean(predictResultSamples, axis=0)
     return predictResult
 
-# 采用random forest算法进行预测
-#    state:采用的森林的大小
-def RandomForest(trainMatrix, trainLabels, testMatrix, state = 10):
-    clf = RandomForestClassifier(oob_score=True, random_state=state)
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
 
-# 采用带深度限制剪枝的决策树进行预测
-def DecisionTree(trainMatrix, trainLabels, testMatrix, maxDepth=26):
-    clf = tree.DecisionTreeClassifier(max_depth=maxDepth)
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
-
-#朴素贝叶斯分类器
-def NaiveBayes(trainMatrix, trainLabels, testMatrix, alpha=0.01):
-    clf = MultinomialNB(alpha=alpha)
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
-
-#采用KNN方法进行预测
-def KNN(trainMatrix, trainLabels, testMatrix):
-    clf = KNeighborsClassifier()
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
-
-#采用logistic回归进行预测
-def Logistic(trainMatrix, trainLabels, testMatrix):
-    clf = LogisticRegression(penalty='l2')
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
-
-#采用SVM进行分类
-def SVM(trainMatrix, trainLabels, testMatrix):
-    clf = svm.LinearSVC()
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
-
-#采用SVR进行回归预测
-def SVR(trainMatrix, trainLabels, testMatrix):
-    clf = svm.LinearSVR()
-    clf.fit(trainMatrix, trainLabels)
-    return clf.predict(testMatrix)
-
-#根据不同的参数method来挑选采用的分类模型
-#    method取值：0-决策树，1-SVM，2-SVR，3-Naive Bayes，4-KNN，5-Logistic Regression，other-随机森林
-def chooseMethod(trainMatrix, trainLabels, testMatrix, method):
-    if (method == 0):
-        return DecisionTree(trainMatrix, trainLabels, testMatrix, maxDepth=None)
-    elif (method == 1):
-        return SVM(trainMatrix, trainLabels, testMatrix)
-    elif (method == 2):
-        return SVR(trainMatrix, trainLabels, testMatrix)
-    elif (method == 3):
-        return NaiveBayes(trainMatrix, trainLabels, testMatrix)
-    elif (method == 4):
-        return KNN(trainMatrix, trainLabels, testMatrix)
-    elif (method == 5):
-        return Logistic(trainMatrix, trainLabels, testMatrix)
-    else:
-        return RandomForest(trainMatrix, trainLabels, testMatrix)
+# 普适的bagging算法
+#    methodLists:Bagging的方法向量
+def commonBagging(trainMatrix, trainLabels, testMatrix, methodLists):
+    predictResultSamples = np.zeros([len(methodLists), len(testMatrix)])
+    for i in range(len(methodLists)):
+        bootstrapIndexs = np.random.randint(low=0, high=len(trainLabels), size=len(trainLabels))
+        print(i, ':', bootstrapIndexs)
+        bootstrapTrainMatrix = trainMatrix[bootstrapIndexs]
+        bootstrapTrainLabels = trainLabels[bootstrapIndexs]
+        predictResultSamples[i, :] = chooseMethod(bootstrapTrainMatrix, bootstrapTrainLabels, testMatrix, methodLists[i])
+    predictResult = np.mean(predictResultSamples, axis=0)
+    return predictResult
 
 
 if __name__ == '__main__':
@@ -182,22 +93,24 @@ if __name__ == '__main__':
         predictResult1 = baggingDT(trainAppearMatrix, trainLabels, trainAppearMatrix, 1, i)
         print('RMSE in trainSet with depth = ',i,':', evaluateResult(trainLabels, predictResult1))
     """
-    #predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 20, maxDepth=26)
-    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
-
-
+    predictResult = baggingDT(trainAppearMatrix, trainLabels, validateAppearMatrix, 20, maxDepth=26)
+    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    methodLists = [1, 2, 3, 4, 5, 6]
+    predictResult = commonBagging(trainAppearMatrix, trainLabels, validateAppearMatrix, methodLists)
+    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 采用单一方法进行测试部分
     #predictResult = RandomForest(trainAppearMatrix, trainLabels, validateAppearMatrix, 50)
     #predictResult = DecisionTree(trainAppearMatrix0, trainLabels0, testAppearMatrix, maxDepth=26)
     #predictResult = NaiveBayes(trainAppearMatrix, trainLabels, validateAppearMatrix)
     #predictResult = KNN(trainAppearMatrix, trainLabels, validateAppearMatrix)
-    predictResult = Logistic(trainAppearMatrix, trainLabels, validateAppearMatrix)
+    #predictResult = Logistic(trainAppearMatrix, trainLabels, validateAppearMatrix)
     #predictResult = SVM(trainAppearMatrix0, trainLabels0, testAppearMatrix)
     #predictResult = SVR(trainAppearMatrix0, trainLabels0, testAppearMatrix)
-    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    #print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     #exportResult(predictResult, 'result/SVR_v1.csv')
     # 结果导出部分
-    #predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=50)
-    #exportResult(predictResult, 'result/decision_tree_bagging_20_prunning50_v1.csv')
-
-
+    predictResult = baggingDT(trainAppearMatrix0, trainLabels0, testAppearMatrix, 20, maxDepth=50)
+    exportResult(predictResult, 'result/decision_tree_bagging_20_prunning50_v1.csv')
+    methodLists = [0,1,2,3,5,6,7]
+    predictResult = commonBagging(trainAppearMatrix0, trainLabels0, testAppearMatrix, methodLists)
+    exportResult(predictResult, 'result/bagging[0,1,2,3,5,6,7]_v1.csv')
