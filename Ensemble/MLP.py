@@ -1,7 +1,4 @@
-from Bagging import loadData
-from Bagging import splitDatas
-from Bagging import evaluateResult
-from Bagging import exportResult
+from commonFunction import *
 import pandas as pd
 import tensorflow as tf
 import numpy as np
@@ -17,7 +14,7 @@ def add_layer(inputs, in_size, out_size, activation_function=None):
         outputs = activation_function(Wx_plus_b)
     return outputs
 
-def MLP(trainMatrix, trainLabels, testMatrix):
+def MLPmethod(trainMatrix, trainLabels, testMatrix):
     trainLabels = np.transpose([trainLabels])
     # define placeholder for inputs to network
     xs = tf.placeholder(tf.float32, [None, 1000])
@@ -51,7 +48,7 @@ def MLP(trainMatrix, trainLabels, testMatrix):
         if (i + 1) % 200 == 0:
             predictions = (sess.run(prediction, feed_dict={xs: trainMatrix, ys: trainLabels}))
             print('#iter ',i+1,' RMSE = ',evaluateResult(trainLabels, predictions))
-    predictResult = (sess.run(prediction, feed_dict={xs: testAppearMatrix, ys: np.zeros([len(testAppearMatrix), 1])}))
+    predictResult = (sess.run(prediction, feed_dict={xs: testMatrix, ys: np.zeros([len(testMatrix), 1])}))
     print(predictResult)
     trainLabels = trainLabels[:,0]
     return predictResult[:,0]
@@ -69,8 +66,8 @@ if __name__ == '__main__':
     # 进行模型训练训练和预测部分
     trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
 
-    predictResult = MLP(trainAppearMatrix, trainLabels, validateLabels)
+    predictResult = MLPmethod(trainAppearMatrix, trainLabels, validateLabels)
     print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
     # 将预测结果输出
-    #predictResult = MLP(trainAppearMatrix0, trainLabels0, testAppearMatrix)
-    #exportResult(predictResult, 'result/MLP_v4_iter30000.csv')
+    predictResult = MLPmethod(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    exportResult(predictResult, 'result/MLP_v4_iter30000.csv')

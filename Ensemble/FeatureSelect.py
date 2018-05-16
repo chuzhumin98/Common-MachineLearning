@@ -92,9 +92,9 @@ if __name__ == '__main__':
     testFilePath = 'exp2.validation_review.csv'
     df1 = pd.read_csv(trainFilePath, encoding='utf-8')
     recordTotalWords(df1)
-    #usefulWords = selectTopWords(df1, 500)
+    usefulWords = selectTopWords(df1, 500)
     usefulWords = loadData('usefulWords200.npy')
     print(usefulWords)
-    #calculateAppearMatrix(usefulWords, df1, 'matrix500.npy')
-    #df2 = pd.read_csv(testFilePath, encoding='utf-8')
-    #calculateAppearMatrix(usefulWords, df2, 'testMatrix500.npy')
+    calculateAppearMatrix(usefulWords, df1, 'matrix500.npy')
+    df2 = pd.read_csv(testFilePath, encoding='utf-8')
+    calculateAppearMatrix(usefulWords, df2, 'testMatrix500.npy')
