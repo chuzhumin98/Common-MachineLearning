@@ -17,17 +17,8 @@ def add_layer(inputs, in_size, out_size, activation_function=None):
         outputs = activation_function(Wx_plus_b)
     return outputs
 
-if __name__ == '__main__':
-    # 导入数据部分
-    trainFilePath = 'exp2.train.csv'
-    df1 = pd.read_csv(trainFilePath, encoding='utf-8')
-    trainLabels0 = np.array(df1['label'])
-    trainAppearMatrix0 = loadData('matrix1000.npy')
-    testAppearMatrix = loadData('testMatrix1000.npy')
-    print('succeed load data')
-    # 进行模型训练训练和预测部分
-    #trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
-    trainLabels0 = np.transpose([trainLabels0])
+def MLP(trainMatrix, trainLabels, testMatrix):
+    trainLabels = np.transpose([trainLabels])
     # define placeholder for inputs to network
     xs = tf.placeholder(tf.float32, [None, 1000])
     ys = tf.placeholder(tf.float32, [None, 1])
@@ -52,17 +43,34 @@ if __name__ == '__main__':
 
     # learning process
     for i in range(30000):
-        indexArray = np.array(range(len(trainLabels0)), dtype=int)  # 下标数组
+        indexArray = np.array(range(len(trainLabels)), dtype=int)  # 下标数组
         np.random.shuffle(indexArray)
-        batchTrainMatrix = trainAppearMatrix0[indexArray[:100],:]
-        batchTrainLabels = trainLabels0[indexArray[:100],:]
+        batchTrainMatrix = trainMatrix[indexArray[:100],:]
+        batchTrainLabels = trainLabels[indexArray[:100],:]
         sess.run(optimizer, feed_dict={xs: batchTrainMatrix, ys: batchTrainLabels})
         if (i + 1) % 200 == 0:
-            predictions = (sess.run(prediction, feed_dict={xs: trainAppearMatrix0, ys: trainLabels0}))
-            print('#iter ',i+1,' RMSE = ',evaluateResult(trainLabels0, predictions))
-
-
-    predictResult = (sess.run(prediction, feed_dict={xs: testAppearMatrix, ys: np.zeros([len(testAppearMatrix),1])}))
+            predictions = (sess.run(prediction, feed_dict={xs: trainMatrix, ys: trainLabels}))
+            print('#iter ',i+1,' RMSE = ',evaluateResult(trainLabels, predictions))
+    predictResult = (sess.run(prediction, feed_dict={xs: testAppearMatrix, ys: np.zeros([len(testAppearMatrix), 1])}))
     print(predictResult)
-    predictResult = predictResult[:,0]
-    exportResult(predictResult, 'result/MLP_v4_iter30000.csv')
+    trainLabels = trainLabels[:,0]
+    return predictResult[:,0]
+
+
+if __name__ == '__main__':
+    # 导入数据部分
+    trainFilePath = 'exp2.train.csv'
+    df1 = pd.read_csv(trainFilePath, encoding='utf-8')
+    trainLabels0 = np.array(df1['label'])
+    trainAppearMatrix0 = loadData('matrix1000.npy')
+    trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
+    testAppearMatrix = loadData('testMatrix1000.npy')
+    print('succeed load data')
+    # 进行模型训练训练和预测部分
+    trainAppearMatrix, trainLabels, validateAppearMatrix, validateLabels = splitDatas(trainAppearMatrix0, trainLabels0)
+
+    predictResult = MLP(trainAppearMatrix, trainLabels, validateLabels)
+    print('RMSE in validateSet:', evaluateResult(validateLabels, predictResult))
+    # 将预测结果输出
+    #predictResult = MLP(trainAppearMatrix0, trainLabels0, testAppearMatrix)
+    #exportResult(predictResult, 'result/MLP_v4_iter30000.csv')
